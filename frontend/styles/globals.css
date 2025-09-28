@@ -1,0 +1,454 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--pink-primary: #ec4899;
+	--pink-secondary: #f43f5e;
+	--rose-primary: #f43f5e;
+	--rose-secondary: #e11d48;
+	--dark-base: #0a0a0a;
+	--dark-secondary: #1a1a1a;
+	--neutral-glow: #f8fafc;
+	--glass-bg: rgba(255, 255, 255, 0.1);
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Inter", "Poppins", sans-serif;
+	scroll-behavior: smooth;
+}
+
+html,
+body {
+	overflow-x: hidden;
+	background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+	background-attachment: fixed;
+	scroll-behavior: smooth !important;
+	color: var(--neutral-glow);
+	line-height: 1.6;
+}
+
+/* Modern Pink Gradient Animations */
+@keyframes float {
+	0%, 100% { transform: translateY(0px) rotate(0deg); }
+	33% { transform: translateY(-10px) rotate(2deg); }
+	66% { transform: translateY(-5px) rotate(-1deg); }
+}
+
+@keyframes glow {
+	0%, 100% {
+		box-shadow: 
+			0 0 20px rgba(236, 72, 153, 0.3),
+			0 0 40px rgba(244, 63, 94, 0.2),
+			0 0 60px rgba(236, 72, 153, 0.1);
+	}
+	50% {
+		box-shadow: 
+			0 0 30px rgba(236, 72, 153, 0.4),
+			0 0 60px rgba(244, 63, 94, 0.3),
+			0 0 90px rgba(236, 72, 153, 0.2);
+	}
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+	0% { transform: translateX(-100%); }
+	100% { transform: translateX(100%); }
+}
+
+@keyframes gradient-shift {
+	0%, 100% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+}
+
+/* Utility Classes */
+.glass-effect {
+	background: var(--glass-bg);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pink-gradient {
+	background: linear-gradient(135deg, var(--pink-primary), var(--rose-primary));
+}
+
+.pink-gradient-text {
+	background: linear-gradient(135deg, var(--pink-primary), var(--rose-primary));
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.animate-float {
+	animation: float 6s ease-in-out infinite;
+}
+
+.animate-glow {
+	animation: glow 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+	animation: pulse 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+	position: relative;
+	overflow: hidden;
+}
+
+.animate-shimmer::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent,
+		rgba(255, 255, 255, 0.2),
+		transparent
+	);
+	animation: shimmer 3s infinite;
+}
+
+.animate-gradient {
+	background-size: 200% 200%;
+	animation: gradient-shift 8s ease infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--dark-secondary);
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: linear-gradient(135deg, var(--pink-primary), var(--rose-primary));
+	border-radius: 10px;
+	transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(135deg, var(--rose-primary), var(--pink-primary));
+	box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+}
+
+/* Selection Styling */
+::selection {
+	background-color: var(--pink-primary);
+	color: white;
+}
+
+/* Typography */
+.font-display {
+	font-family: "Poppins", sans-serif;
+	font-weight: 700;
+}
+
+.font-body {
+	font-family: "Inter", sans-serif;
+	font-weight: 400;
+}
+
+/* Button Styles */
+.btn-primary {
+	@apply px-8 py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-pink-500/25;
+}
+
+.btn-secondary {
+	@apply px-8 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-white/20 transition-all duration-300;
+}
+
+/* Card Styles */
+.card-glass {
+	@apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300;
+}
+
+.card-glow {
+	@apply relative bg-gray-900/50 backdrop-blur-lg rounded-2xl border border-white/10 hover:border-pink-500/30 transition-all duration-300;
+}
+
+/* Text Effects */
+.text-glow {
+	text-shadow: 
+		0 0 10px rgba(236, 72, 153, 0.5),
+		0 0 20px rgba(244, 63, 94, 0.3),
+		0 0 30px rgba(236, 72, 153, 0.2);
+}
+
+/* Layout */
+.section-padding {
+	@apply py-20 px-4 md:py-32;
+}
+
+.container-custom {
+	@apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Neon Glow Animations - Subtle Version */
+@keyframes neonPulse {
+	0%, 100% {
+		text-shadow: 
+			0 0 2px var(--neon-magenta),
+			0 0 4px var(--neon-magenta);
+	}
+	50% {
+		text-shadow: 
+			0 0 1px var(--neon-magenta),
+			0 0 2px var(--neon-magenta);
+	}
+}
+
+@keyframes neonFlicker {
+	0%, 100% { opacity: 1; }
+	95% { opacity: 0.95; }
+}
+
+@keyframes electricPulse {
+	0%, 100% {
+		box-shadow: 
+			0 0 2px var(--electric-purple),
+			0 0 4px var(--electric-purple);
+	}
+	50% {
+		box-shadow: 
+			0 0 3px var(--electric-purple),
+			0 0 6px var(--electric-purple);
+	}
+}
+
+@keyframes blob {
+	0%, 100% {
+		transform: translateY(0) rotate(0deg);
+	}
+	33% {
+		transform: translateY(-20px) rotate(120deg);
+	}
+	66% {
+		transform: translateY(-10px) rotate(240deg);
+	}
+}
+
+@keyframes gradient-x {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+/* Utility Classes - Toned Down */
+.neon-text {
+	color: var(--neon-magenta);
+	text-shadow: 
+		0 0 2px var(--neon-magenta),
+		0 0 4px var(--neon-magenta);
+}
+
+.neon-text-purple {
+	color: var(--electric-purple);
+	text-shadow: 
+		0 0 2px var(--electric-purple),
+		0 0 4px var(--electric-purple);
+}
+
+.neon-text-pink {
+	color: var(--neon-pink);
+	text-shadow: 
+		0 0 2px var(--neon-pink),
+		0 0 4px var(--neon-pink);
+}
+
+.glow-border {
+	border: 1px solid var(--neon-magenta);
+	box-shadow: 
+		0 0 2px var(--neon-magenta),
+		0 0 4px var(--neon-magenta);
+}
+
+.animate-blob {
+	animation: blob 8s infinite;
+}
+
+.animate-neon-flicker {
+	animation: neonFlicker 1.5s ease-in-out infinite;
+}
+
+.animation-delay-2000 {
+	animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+	animation-delay: 4s;
+}
+
+/* Enhanced Custom Scrollbar Styles - IEEEXtreme Neon Theme */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+	background-color: transparent;
+}
+
+::-webkit-scrollbar-track {
+	background: rgba(10, 10, 10, 0.8);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 0, 204, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 0, 204, 0.3);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+	border-radius: 20px;
+	border: 1px solid rgba(255, 77, 227, 0.2);
+	box-shadow: 
+		inset 0 0 20px rgba(255, 0, 204, 0.2),
+		0 0 10px rgba(255, 0, 204, 0.3);
+	transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 0, 204, 0.5);
+	border: 1px solid rgba(255, 77, 227, 0.4);
+	box-shadow: 
+		inset 0 0 30px rgba(255, 0, 204, 0.3),
+		0 0 15px rgba(255, 0, 204, 0.4),
+		0 0 25px rgba(138, 0, 255, 0.2);
+}
+
+/* When scrollbar is in active/clicked state */
+::-webkit-scrollbar-thumb:active {
+	background: rgba(255, 0, 204, 0.7);
+	border: 1px solid rgba(255, 77, 227, 0.5);
+	box-shadow: 
+		inset 0 0 40px rgba(255, 0, 204, 0.4),
+		0 0 20px rgba(255, 0, 204, 0.5),
+		0 0 30px rgba(138, 0, 255, 0.3);
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+/* Additional Neon Effects and Animations */
+@keyframes glowPulse {
+	0%, 100% {
+		box-shadow: 
+			0 0 5px var(--neon-magenta),
+			0 0 10px var(--neon-magenta),
+			0 0 15px var(--neon-magenta);
+	}
+	50% {
+		box-shadow: 
+			0 0 10px var(--neon-magenta),
+			0 0 20px var(--neon-magenta),
+			0 0 30px var(--neon-magenta);
+	}
+}
+
+@keyframes textGlow {
+	0%, 100% {
+		text-shadow: 
+			0 0 5px currentColor,
+			0 0 10px currentColor,
+			0 0 15px currentColor;
+	}
+	50% {
+		text-shadow: 
+			0 0 2px currentColor,
+			0 0 5px currentColor,
+			0 0 8px currentColor;
+	}
+}
+
+@keyframes borderGlow {
+	0%, 100% {
+		border-color: var(--neon-magenta);
+		box-shadow: 
+			0 0 5px var(--neon-magenta),
+			inset 0 0 5px var(--neon-magenta);
+	}
+	50% {
+		border-color: var(--neon-pink);
+		box-shadow: 
+			0 0 10px var(--neon-pink),
+			inset 0 0 10px var(--neon-pink);
+	}
+}
+
+/* Font Face Definitions */
+.font-orbitron {
+	font-family: "Orbitron", monospace;
+}
+
+.font-rajdhani {
+	font-family: "Rajdhani", sans-serif;
+}
+
+/* Enhanced Utility Classes */
+.animate-glow-pulse {
+	animation: glowPulse 3s ease-in-out infinite;
+}
+
+.animate-text-glow {
+	animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+.animate-border-glow {
+	animation: borderGlow 2s ease-in-out infinite alternate;
+}
+
+/* Hover Effects */
+.hover-glow:hover {
+	box-shadow: 
+		0 0 20px var(--neon-magenta),
+		0 0 40px var(--neon-magenta),
+		0 0 60px var(--neon-magenta);
+	transition: box-shadow 0.3s ease;
+}
+
+.hover-text-glow:hover {
+	text-shadow: 
+		0 0 10px currentColor,
+		0 0 20px currentColor,
+		0 0 30px currentColor;
+	transition: text-shadow 0.3s ease;
+}
+
+/* Selection Styling */
+::selection {
+	background-color: var(--neon-magenta);
+	color: var(--dark-base);
+}
+
+ @keyframes shine {
+  from {
+	     left: -100%;
+  }
+	  to {
+	    left: 200%;
+	   }
+	 }
+	 .animate-shine {
+   animation: shine 1.5s ease-in-out infinite;
+ }
