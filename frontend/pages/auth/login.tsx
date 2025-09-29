@@ -29,9 +29,7 @@ export default function LoginPage() {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
@@ -41,17 +39,22 @@ export default function LoginPage() {
         throw new Error(result.message || 'Login failed');
       }
 
-      // Store JWT token and user info
-      localStorage.setItem('token', result.access_token);
-      localStorage.setItem('user', JSON.stringify(result.user));
+      // Store JWT token and user info with consistent keys
+      if (result.access_token) {
+        localStorage.setItem('authToken', result.access_token);
+      }
+      if (result.user?.role) {
+        localStorage.setItem('role', result.user.role);
+      }
+      localStorage.setItem('user', JSON.stringify(result.user || {}));
 
       // Redirect based on role
-      if (result.user.role === 'farmer') {
+      if (result.user?.role === 'buyer') {
+        router.push('/marketplace');
+      } else if (result.user?.role === 'farmer') {
         router.push('/vendor/dashboard');
-      } else if (result.user.role === 'buyer') {
-        router.push('/buyer/dashboard');  
       } else {
-        router.push('/'); // Default redirect
+        router.push('/');
       }
 
     } catch (err: any) {

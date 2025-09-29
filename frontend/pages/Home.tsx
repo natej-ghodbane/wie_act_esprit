@@ -9,6 +9,7 @@ import 'aos/dist/aos.css'
 
 // Import the new Chatbot component
 import Chatbot from '../components/chatbot'; // Adjust path as necessary
+import FeaturedProducts from '../components/FeaturedProducts'
 
 // Component prop types
 interface CTAButtonProps {
@@ -282,6 +283,8 @@ const Home = () => {
 
       {/* RENDER THE NEW CHATBOT COMPONENT HERE */}
       <Chatbot /> 
+
+      <FeaturedProducts />
 
     </div>
     

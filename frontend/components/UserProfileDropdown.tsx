@@ -36,7 +36,9 @@ export default function UserProfileDropdown({ user }: UserProfileDropdownProps) 
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     router.push('/');
   };
 
