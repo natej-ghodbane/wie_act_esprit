@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import UserProfileDropdown from '../../components/UserProfileDropdown';
+import ReclamationSystem from '../../components/reclamation/ReclamationSystem';
 
 interface User {
   id: string;
@@ -78,6 +79,7 @@ export default function VendorDashboard() {
               <button className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-full hover:scale-105 transition-transform duration-300 font-medium text-sm">
                 Add Product
               </button>
+              <ReclamationSystem size="sm" variant="secondary" />
               <UserProfileDropdown user={user} />
             </div>
           </div>
@@ -109,12 +111,39 @@ export default function VendorDashboard() {
           </div>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-pink-200/20">
-          <div className="px-6 py-4 border-b border-pink-200/20">
-            <h3 className="text-lg font-semibold text-gray-800">Recent Products</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Recent Products */}
+          <div className="lg:col-span-2 bg-white/10 backdrop-blur-xl rounded-2xl border border-pink-200/20">
+            <div className="px-6 py-4 border-b border-pink-200/20">
+              <h3 className="text-lg font-semibold text-gray-800">Recent Products</h3>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-700">Your agricultural products will appear here...</p>
+            </div>
           </div>
-          <div className="p-6">
-            <p className="text-gray-700">Your agricultural products will appear here...</p>
+
+          {/* Support Section */}
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-pink-200/20">
+            <div className="px-6 py-4 border-b border-pink-200/20">
+              <h3 className="text-lg font-semibold text-gray-800">🛟 Need Support?</h3>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-600 text-sm mb-4">
+                Having issues with orders, products, or payments? Submit a reclamation to get help from our support team.
+              </p>
+              <div className="space-y-3">
+                <div className="text-xs text-gray-500">
+                  <p>Common issues we can help with:</p>
+                  <ul className="mt-2 space-y-1 list-disc list-inside">
+                    <li>Payment disputes</li>
+                    <li>Order problems</li>
+                    <li>Product damage reports</li>
+                    <li>Return requests</li>
+                  </ul>
+                </div>
+                <ReclamationSystem size="md" className="w-full" />
+              </div>
+            </div>
           </div>
         </div>
         </div>
