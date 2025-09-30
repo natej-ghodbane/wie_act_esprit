@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Central Farmers Market",
+    "slug": "central-farmers-market",
+    "description": "Fresh local produce and artisanal goods in the heart of the city",
+    "location": {
+      "country": "TN",
+      "city": "Tunis",
+      "address": "Avenue Habib Bourguiba",
+      "coords": { "lat": 36.8065, "lng": 10.1815 }
+    },
+    "bannerImage": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&h=400&fit=crop",
+    "logoImage": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=200&h=200&fit=crop",
+    "categories": ["vegetables", "fruits", "dairy", "grains"],
+    "isActive": true
+  },
+  {
+    "name": "North Valley Market",
+    "slug": "north-valley-market",
+    "description": "Seasonal produce from valley farms",
+    "location": {
+      "country": "TN",
+      "city": "Ariana",
+      "address": "Rue de l'Innovation",
+      "coords": { "lat": 36.8665, "lng": 10.1647 }
+    },
+    "bannerImage": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop",
+    "logoImage": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=200&h=200&fit=crop",
+    "categories": ["vegetables", "fruits", "herbs"],
+    "isActive": true
+  },
+  {
+    "name": "Coastal Organics",
+    "slug": "coastal-organics",
+    "description": "Organic produce from coastal farms",
+    "location": {
+      "country": "TN",
+      "city": "Sfax",
+      "address": "Port de Sfax",
+      "coords": { "lat": 34.7406, "lng": 10.7603 }
+    },
+    "bannerImage": "https://images.unsplash.com/photo-1506905925346-14b5e4b1e6c0?w=800&h=400&fit=crop",
+    "logoImage": "https://images.unsplash.com/photo-1506905925346-14b5e4b1e6c0?w=200&h=200&fit=crop",
+    "categories": ["seafood", "fruits", "herbs"],
+    "isActive": true
+  }
+]

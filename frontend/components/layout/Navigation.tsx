@@ -184,12 +184,12 @@ export function Navigation({ className }: NavigationProps) {
 
             {/* Auth Buttons - Desktop */}
             <div className="hidden lg:flex items-center space-x-2">
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button variant="ghost" leftIcon={<LogIn className="w-4 h-4" />}>
                   Login
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/auth/signup">
                 <Button variant="default" leftIcon={<UserPlus className="w-4 h-4" />}>
                   Sign Up
                 </Button>
@@ -286,12 +286,12 @@ export function Navigation({ className }: NavigationProps) {
                     {isDarkMode ? 'Light' : 'Dark'} Mode
                   </Button>
                   <div className="flex space-x-2">
-                    <Link href="/login">
+                    <Link href="/auth/login">
                       <Button variant="ghost" size="sm">
                         Login
                       </Button>
                     </Link>
-                    <Link href="/register">
+                    <Link href="/auth/signup">
                       <Button variant="default" size="sm">
                         Sign Up
                       </Button>

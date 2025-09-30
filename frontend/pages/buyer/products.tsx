@@ -18,7 +18,7 @@ export default function BuyerProductsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('user');
     if (!token || !userData) {
       router.push('/auth/login');
@@ -50,8 +50,9 @@ export default function BuyerProductsPage() {
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     router.push('/');
   };
 

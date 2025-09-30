@@ -20,7 +20,7 @@ export default function BuyerDashboard() {
 
   useEffect(() => {
     // Check authentication
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('user');
 
     if (!token || !userData) {
@@ -44,8 +44,9 @@ export default function BuyerDashboard() {
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     router.push('/');
   };
 
@@ -66,22 +67,13 @@ export default function BuyerDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-200 via-rose-200 to-orange-200">
       <div className="flex">
-        <BuyerSidebar onLogout={handleLogout} onOpenChange={setSidebarOpen} user={user} />
+        <BuyerSidebar onLogout={handleLogout} onOpenChange={setSidebarOpen} />
         <div className={"flex-1 " + (sidebarOpen ? 'md:ml-64' : '')}>
           {/* Fixed Navigation Bar */}
           <nav className="sticky top-0 z-20 bg-white/10 backdrop-blur-xl border-b border-white/20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
-                <div className="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">A</span>
-                  </div>
-                  <span>AGRI-HOPE</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="text-gray-700 hidden lg:block">Welcome back!</span>
-                  <UserProfileDropdown user={user} />
-                </div>
+            <div className="px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-end items-center h-16">
+                <UserProfileDropdown user={user} />
               </div>
             </div>
           </nav>
