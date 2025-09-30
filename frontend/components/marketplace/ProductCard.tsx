@@ -25,6 +25,8 @@ interface ProductCardProps {
 export default function ProductCard({ product, onAdd }: ProductCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [imgSrc, setImgSrc] = useState<string>(product.image || '/placeholder.png');
+  const safePrice = Number.isFinite(Number(product?.price)) ? Number(product.price) : 0;
 
   const handleAddToCart = async () => {
     if (!onAdd) return;
@@ -37,12 +39,14 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
     <div className="card-glass group overflow-hidden">
       <div className="relative overflow-hidden">
         <Image
-          src={product.image}
+          src={imgSrc}
           alt={product.name}
           width={300}
           height={200}
           className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
           loading="lazy"
+          unoptimized
+          onError={() => setImgSrc('/placeholder.png')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <Button
@@ -95,7 +99,7 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xl font-bold text-neutral-900 dark:text-white">
-            ${product.price.toFixed(2)}
+            ${safePrice.toFixed(2)}
           </span>
           <Button
             onClick={handleAddToCart}

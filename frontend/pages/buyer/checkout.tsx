@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import BuyerSidebar from '../../components/BuyerSidebar';
-import { MarketplacePage as MarketplaceInner } from '../../components/marketplace/MarketplacePage';
+import CheckoutStandalone from '../checkout';
 import UserProfileDropdown from '../../components/UserProfileDropdown';
 
-export default function BuyerMarketplacePage() {
+export default function BuyerCheckoutPage() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -38,23 +38,20 @@ export default function BuyerMarketplacePage() {
     <div className="min-h-screen bg-gradient-to-br from-pink-200 via-rose-200 to-orange-200">
       <div className="flex">
         <BuyerSidebar onLogout={handleLogout} onOpenChange={setSidebarOpen} />
-        <main className={'flex-1 ' + (sidebarOpen ? 'md:ml-64' : '')}>
-          <nav className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-pink-200/50 shadow-sm">
+        <main className={"flex-1 " + (sidebarOpen ? 'md:ml-64' : '')}>
+          <nav className="sticky top-0 z-20 bg-white/10 backdrop-blur-xl border-b border-white/20">
             <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
-                <div className="flex items-center space-x-4">
-                  <h1 className="text-lg font-semibold text-gray-800">Marketplace</h1>
-                </div>
-                <div className="flex items-center space-x-4">
-                  {user && <UserProfileDropdown user={user} />}
-                </div>
+              <div className="flex justify-end items-center h-16">
+                {user && <UserProfileDropdown user={user} />}
               </div>
             </div>
           </nav>
-          <MarketplaceInner />
+          {/* Reuse the existing checkout UI inside the buyer shell */}
+          <CheckoutStandalone />
         </main>
       </div>
     </div>
   );
 }
+
 

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from 'next/link'
-import { mockProducts } from './data/mockData'
+import { useEffect, useState } from 'react'
+import { marketplaceAPI } from '@/utils/api'
 import { Star, MapPin, Boxes } from 'lucide-react'
 
 function normalizeSlug(input: string): string {
@@ -19,30 +20,40 @@ interface VendorCardData {
 }
 
 export default function VendorsGrid() {
-  const vendorMap = new Map<string, VendorCardData>()
+  const [vendors, setVendors] = useState<VendorCardData[]>([])
+  const [loading, setLoading] = useState(true)
 
-  mockProducts.forEach(p => {
-    const name = p.farmer
-    const slug = normalizeSlug(name)
-    const existing = vendorMap.get(name)
-    if (!existing) {
-      vendorMap.set(name, {
-        name,
-        slug,
-        image: p.image,
-        location: p.location,
-        productsCount: 1,
-        avgRating: p.rating,
-        categories: [p.category],
-      })
-    } else {
-      existing.productsCount += 1
-      existing.avgRating = (existing.avgRating + p.rating) / 2
-      if (!existing.categories.includes(p.category)) existing.categories.push(p.category)
+  useEffect(() => {
+    let active = true
+    const fetchVendors = async () => {
+      try {
+        console.log('Fetching marketplaces...')
+        const { data } = await marketplaceAPI.getAll()
+        console.log('Marketplaces response:', data)
+        if (!active) return
+        const mapped: VendorCardData[] = Array.isArray(data)
+          ? data.map((m: any) => ({
+              name: m.name,
+              slug: m.slug || normalizeSlug(m.name),
+              image: m.bannerImage || '/placeholder.png',
+              location: m.location?.city,
+              productsCount: m.productsCount || 0, // This should now come from backend
+              avgRating: Number(m.avgRating || 4.5),
+              categories: Array.isArray(m.categories) ? m.categories : [],
+            }))
+          : []
+        console.log('Mapped vendors:', mapped)
+        setVendors(mapped)
+      } catch (e) {
+        console.error('Error fetching marketplaces:', e)
+        setVendors([])
+      } finally {
+        if (active) setLoading(false)
+      }
     }
-  })
-
-  const vendors = Array.from(vendorMap.values())
+    fetchVendors()
+    return () => { active = false }
+  }, [])
 
   return (
     <div className="container-custom py-10">
@@ -52,7 +63,10 @@ export default function VendorsGrid() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {vendors.map((v, idx) => (
+        {loading && (
+          <div className="col-span-full text-white/80">Loading marketplaces...</div>
+        )}
+        {!loading && vendors.map((v, idx) => (
           <Link key={v.slug} href={`/marketplace/vendor/${v.slug}`} className="group">
             <article
               className="relative overflow-hidden rounded-2xl border border-white/15 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 hover:shadow-[0_8px_50px_rgb(236,72,153,0.25)] hover:-translate-y-0.5"

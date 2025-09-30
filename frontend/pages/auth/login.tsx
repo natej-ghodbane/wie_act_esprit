@@ -50,7 +50,7 @@ export default function LoginPage() {
 
       // Redirect based on role
       if (result.user?.role === 'buyer') {
-        router.push('/marketplace');
+        router.push('/buyer/dashboard');
       } else if (result.user?.role === 'farmer') {
         router.push('/vendor/dashboard');
       } else {

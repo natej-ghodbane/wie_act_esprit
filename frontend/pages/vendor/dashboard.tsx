@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import UserProfileDropdown from '../../components/UserProfileDropdown';
+import AddProductModal from '../../components/AddProductModal';
 
 interface User {
   id: string;
@@ -16,10 +17,11 @@ export default function VendorDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddProduct, setShowAddProduct] = useState(false);
 
   useEffect(() => {
     // Check authentication
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('user');
 
     if (!token || !userData) {
@@ -43,8 +45,9 @@ export default function VendorDashboard() {
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     router.push('/');
   };
 
@@ -75,7 +78,10 @@ export default function VendorDashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700 hidden lg:block">Welcome back!</span>
-              <button className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-full hover:scale-105 transition-transform duration-300 font-medium text-sm">
+              <button 
+                onClick={() => setShowAddProduct(true)}
+                className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-full hover:scale-105 transition-transform duration-300 font-medium text-sm"
+              >
                 Add Product
               </button>
               <UserProfileDropdown user={user} />
@@ -119,6 +125,15 @@ export default function VendorDashboard() {
         </div>
         </div>
       </div>
+
+      <AddProductModal
+        isOpen={showAddProduct}
+        onClose={() => setShowAddProduct(false)}
+        onSuccess={() => {
+          // Refresh products or show success message
+          console.log('Product created successfully!');
+        }}
+      />
     </div>
   );
 }
