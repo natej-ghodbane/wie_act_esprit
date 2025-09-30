@@ -155,9 +155,9 @@ const Home = () => {
         ))}
       </div>
 
-      <div className={`relative z-10 transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}>
-        <div className="container mx-auto px-[5%] sm:px-6 lg:px-[10%] min-h-screen">
-          <div className="flex flex-col items-center justify-center h-screen text-center">
+      <div className={`relative z-10 transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}>
+        <div className="container mx-auto px-[5%] sm:px-6 lg:px-[10%] min-h-[calc(100vh-64px)]">
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] text-center">
             {/* Main Content */}
             <div className="w-full max-w-4xl space-y-6 sm:space-y-8"
               data-aos="fade-up"

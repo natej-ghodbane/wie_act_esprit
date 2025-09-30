@@ -1,21 +1,97 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Menu, X } from "lucide-react";
+import UserProfileDropdown from "./UserProfileDropdown";
+import { getRoleFromStorageOrToken, isBuyerRole } from "../utils/auth";
 
 interface NavItem {
     href: string;
     label: string;
 }
 
+interface User {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    profileImage?: string;
+    farmLocation?: string;
+}
+
 const Navbar: React.FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [scrolled, setScrolled] = useState<boolean>(false);
     const [activeSection, setActiveSection] = useState<string>("Home");
-    
-    const navItems: NavItem[] = [
-        { href: "#Home", label: "Home" },
-        { href: "/auth/login", label: "Sign In" },
-    ];
+    const [user, setUser] = useState<User | null>(null);
+    const [role, setRole] = useState<string | null>(null);
+    const router = useRouter();
+
+    const readAuthFromStorage = () => {
+        try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+            const userData = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+            let storedRole = typeof window !== 'undefined' ? localStorage.getItem('role') : null;
+            // If no stored role, try to decode from token
+            if (!storedRole) {
+                storedRole = getRoleFromStorageOrToken();
+            }
+            const normalizedRole = storedRole ? storedRole.toLowerCase() : null;
+            const parsed = userData ? JSON.parse(userData) : null;
+            // Ensure safe defaults for dropdown
+            const safeUser = parsed ? {
+                id: parsed.id,
+                email: parsed.email || '',
+                firstName: parsed.firstName || '',
+                lastName: parsed.lastName || '',
+                role: (parsed.role || normalizedRole || '').toLowerCase(),
+                profileImage: parsed.profileImage,
+                farmLocation: parsed.farmLocation,
+            } as User : null;
+            if (token && safeUser) {
+                setUser(safeUser);
+            } else {
+                setUser(null);
+            }
+            setRole(normalizedRole);
+        } catch {
+            setUser(null);
+            setRole(null);
+        }
+    };
+
+    useEffect(() => {
+        // Initial read
+        readAuthFromStorage();
+        // Listen to route changes to refresh auth state after login redirects
+        const onRoute = () => readAuthFromStorage();
+        router.events.on('routeChangeComplete', onRoute);
+        // Refresh on window focus
+        const onFocus = () => readAuthFromStorage();
+        window.addEventListener('focus', onFocus);
+        // Cross-tab changes
+        const onStorage = (e: StorageEvent) => {
+            if (e.key === 'authToken' || e.key === 'user' || e.key === 'role') {
+                readAuthFromStorage();
+            }
+        };
+        window.addEventListener('storage', onStorage);
+        return () => {
+            router.events.off('routeChangeComplete', onRoute);
+            window.removeEventListener('focus', onFocus);
+            window.removeEventListener('storage', onStorage);
+        };
+    }, [router.events]);
+
+    const navItems: NavItem[] = useMemo(() => {
+        const items: NavItem[] = [{ href: "#Home", label: "Home" }];
+        // Removed buyer-specific links from navbar
+        if (!user) {
+            items.push({ href: "/auth/login", label: "Sign In" });
+        }
+        return items;
+    }, [user]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -100,9 +176,9 @@ const Navbar: React.FC = () => {
                             <span>AGRI-HOPE</span>
                         </a>
                     </div>
-    
+
                     {/* Desktop Navigation */}
-                    <div className="hidden md:block">
+                    <div className="hidden md:flex items-center">
                         <div className="ml-8 flex items-center space-x-8">
                             {navItems.map((item) => (
                                 item.href.startsWith('#') ? (
@@ -141,8 +217,11 @@ const Navbar: React.FC = () => {
                                 )
                             ))}
                         </div>
+                        <div className="ml-6">
+                            {user && <UserProfileDropdown user={user} />}
+                        </div>
                     </div>
-    
+
                     {/* Mobile Menu Button */}
                     <div className="md:hidden">
                         <button
@@ -168,6 +247,11 @@ const Navbar: React.FC = () => {
             >
                 <div className="flex flex-col h-full">
                     <div className="px-4 py-6 space-y-4 flex-1">
+                        {user && (
+                            <div className="px-4">
+                                <UserProfileDropdown user={user} />
+                            </div>
+                        )}
                         {navItems.map((item) => (
                             item.href.startsWith('#') ? (
                                 <a

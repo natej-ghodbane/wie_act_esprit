@@ -5,20 +5,20 @@ import ProductCard, { ProductUI } from './ProductCard';
 import PaymentModal from './PaymentModal';
 import { Button } from '@/components/ui/Button';
 
-import { mockProducts } from './data/mockData';
+import { productAPI } from '@/utils/api';
 
-// Map the mock data to match ProductUI type
-const sampleProducts: ProductUI[] = mockProducts.map(product => ({
-  id: String(product.id),
-  name: product.name,
-  price: product.price,
-  image: product.image,
-  category: product.category,
-  description: product.description,
-  rating: product.rating,
-  reviews: product.reviews,
-  vendorName: product.farmer
-}));
+// Backend returns products; map to ProductUI fields we display
+const mapApiToUI = (p: any): ProductUI => ({
+  id: String(p._id || p.id),
+  name: p.title,
+  price: p.price,
+  image: p.images?.[0] || '/placeholder.png',
+  category: p.category,
+  description: p.description,
+  rating: 4.5,
+  reviews: 12,
+  vendorName: p.vendorName || p.vendorId || 'Vendor',
+});
 
 interface CartItem { id: string; name: string; price: number; quantity: number; }
 
@@ -33,14 +33,27 @@ export default function ProductGrid({ vendorName }: ProductGridProps) {
   const [isPaymentOpen, setPaymentOpen] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const filteredProducts = vendorName 
-        ? sampleProducts.filter(p => p.vendorName === vendorName)
-        : sampleProducts;
-      setProducts(filteredProducts);
-      setIsLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
+    let isActive = true;
+    setIsLoading(true);
+    const fetchProducts = async () => {
+      try {
+        const params: any = {};
+        if (vendorName) params.vendorName = vendorName;
+        const { data } = await productAPI.getAll(params);
+        if (!isActive) return;
+        const mapped: ProductUI[] = Array.isArray(data) ? data.map(mapApiToUI) : [];
+        setProducts(mapped);
+      } catch (e) {
+        // Fallback to empty on error
+        if (isActive) setProducts([]);
+      } finally {
+        if (isActive) setIsLoading(false);
+      }
+    };
+    fetchProducts();
+    return () => {
+      isActive = false;
+    };
   }, [vendorName]);
 
   const total = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.quantity, 0), [cart]);

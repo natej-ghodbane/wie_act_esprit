@@ -178,34 +178,7 @@ export function MarketplacePage({ className, user }: MarketplacePageProps) {
 
   return (
     <div className={cn('min-h-screen pt-20 pb-10', className)}>
-      {/* Hero Section */}
-      <nav className="fixed w-full top-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center">
-                <span className="text-white text-sm font-bold">A</span>
-              </div>
-              <span>AGRI-HOPE</span>
-            </div>
-            <div className="flex items-center space-x-6">
-              <button
-                onClick={() => router.push('/buyer/marketplace')}
-                className="text-white hover:text-pink-500 transition-colors"
-              >
-                Marketplace
-              </button>
-              <button
-                onClick={() => router.push('/buyer/checkout')}
-                className="text-white hover:text-pink-500 transition-colors"
-              >
-                Checkout
-              </button>
-              {user && <UserProfileDropdown user={user} />}
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Hero Section (navbar provided by buyer layout; keep space with padding) */}
 
       <section className="relative py-16 mt-16 bg-gradient-to-br from-pink-200 via-rose-200 to-orange-200 dark:from-[#0a0a0a] dark:via-[#1a1a1a] dark:to-[#0a0a0a]">
         <div className="container-custom">
@@ -248,7 +221,6 @@ export function MarketplacePage({ className, user }: MarketplacePageProps) {
       <section className="py-10">
         <VendorsGrid />
       </section>
-
 
     </div>
   )

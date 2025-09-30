@@ -67,4 +67,10 @@ export const orderAPI = {
   updateStatus: (id: string, status: string) => apiClient.put(`/orders/${id}/status`, { status }),
 };
 
+export const marketplaceAPI = {
+  getAll: () => apiClient.get('/marketplaces'),
+  getBySlug: (slug: string, include?: 'products') =>
+    apiClient.get(`/marketplaces/${slug}`, { params: include ? { include } : undefined }),
+};
+
 export default apiClient;
