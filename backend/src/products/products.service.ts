@@ -15,12 +15,21 @@ export class ProductsService {
   async findAll(filters?: FilterQuery<ProductDocument>) {
     const query = filters ? { ...filters, isActive: true } : { isActive: true };
     
+    // Convert vendorId to ObjectId if it's a string
+    if (query.vendorId && typeof query.vendorId === 'string') {
+      query.vendorId = new Types.ObjectId(query.vendorId);
+    }
+    
     // Convert marketplaceId to ObjectId if it's a string
     if (query.marketplaceId && typeof query.marketplaceId === 'string') {
       query.marketplaceId = new Types.ObjectId(query.marketplaceId);
     }
     
-    return this.productModel.find(query).lean();
+    console.log('Finding products with query:', JSON.stringify(query, null, 2));
+    const products = await this.productModel.find(query).lean();
+    console.log('Found products:', products.length);
+    console.log('Products vendorIds:', products.map(p => ({ id: p._id, vendorId: p.vendorId })));
+    return products;
   }
 
   // Get single product by ID
@@ -38,18 +47,28 @@ export class ProductsService {
 
   // Create new product
   async create(vendorId: string, createProductDto: CreateProductDto) {
+    console.log('=== CREATING PRODUCT ===');
+    console.log('VendorId received:', vendorId);
+    console.log('CreateProductDto:', createProductDto);
+    
     // Validate marketplace ID
     if (!Types.ObjectId.isValid(createProductDto.marketplaceId)) {
       throw new BadRequestException('Invalid marketplace ID');
     }
 
+    const vendorObjectId = new Types.ObjectId(vendorId);
+    console.log('VendorId as ObjectId:', vendorObjectId);
+
     const product = new this.productModel({
       ...createProductDto,
-      vendorId: new Types.ObjectId(vendorId),
+      vendorId: vendorObjectId,
       marketplaceId: new Types.ObjectId(createProductDto.marketplaceId),
     });
 
-    return product.save();
+    const savedProduct = await product.save();
+    console.log('Product saved with vendorId:', savedProduct.vendorId);
+    console.log('Product saved with _id:', savedProduct._id);
+    return savedProduct;
   }
 
   // Update product

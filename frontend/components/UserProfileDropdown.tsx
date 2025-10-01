@@ -147,7 +147,7 @@ export default function UserProfileDropdown({ user }: UserProfileDropdownProps) 
             <button
               onClick={() => {
                 setIsOpen(false);
-                // TODO: Navigate to profile settings
+                router.push(`/${user.role === 'farmer' ? 'vendor' : user.role}/profile`);
               }}
               className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150"
             >

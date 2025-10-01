@@ -124,13 +124,13 @@ export default function VendorDashboard() {
     <div className={`min-h-screen transition-all duration-700 relative overflow-hidden ${
       isDarkMode 
         ? 'bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900' 
-        : 'bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-50'
+        : 'bg-gradient-to-br from-purple-100 via-pink-100 to-fuchsia-100'
     }`}>
       {/* Animated gradient blobs for light mode */}
       {!isDarkMode && (
         <>
           <motion.div
-            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-purple-300/30 to-pink-300/30 rounded-full blur-3xl"
+            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-purple-400/40 to-pink-400/40 rounded-full blur-3xl"
             animate={{
               scale: [1, 1.2, 1],
               x: [0, 50, 0],
@@ -143,7 +143,7 @@ export default function VendorDashboard() {
             }}
           />
           <motion.div
-            className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-fuchsia-300/30 to-rose-300/30 rounded-full blur-3xl"
+            className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-fuchsia-400/40 to-rose-400/40 rounded-full blur-3xl"
             animate={{
               scale: [1, 1.3, 1],
               x: [0, -30, 0],
@@ -156,7 +156,7 @@ export default function VendorDashboard() {
             }}
           />
           <motion.div
-            className="absolute top-1/2 left-1/3 w-72 h-72 bg-gradient-to-br from-pink-400/20 to-purple-400/20 rounded-full blur-2xl"
+            className="absolute top-1/2 left-1/3 w-72 h-72 bg-gradient-to-br from-pink-500/30 to-purple-500/30 rounded-full blur-2xl"
             animate={{
               scale: [1, 1.1, 1],
               rotate: [0, 180, 360],
@@ -169,9 +169,6 @@ export default function VendorDashboard() {
           />
         </>
       )}
-
-      {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
       
       {/* Advanced Navigation Bar with Glassmorphism */}
       <motion.nav 
@@ -219,16 +216,6 @@ export default function VendorDashboard() {
                   className="bg-transparent outline-none text-sm w-32 lg:w-48"
                 />
               </motion.div>
-
-              {/* Add Product Button */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 font-medium text-sm flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Add Product</span>
-              </motion.button>
 
               {/* Theme Toggle */}
               <motion.button
@@ -336,7 +323,7 @@ export default function VendorDashboard() {
                 className={`relative overflow-hidden backdrop-blur-xl rounded-3xl border transition-all duration-500 group shadow-lg ${
                   isDarkMode 
                     ? 'bg-purple-900/40 border-purple-700/50 hover:bg-purple-900/50 hover:border-purple-600/50' 
-                    : 'bg-white/70 border-purple-200/80 hover:bg-white/80 hover:border-purple-300/80 hover:shadow-xl'
+                    : 'bg-white/60 border-purple-300/80 hover:bg-white/70 hover:border-purple-400/80 hover:shadow-xl'
                 }`}
               >
                 <div className="p-6">
@@ -381,12 +368,10 @@ export default function VendorDashboard() {
             <h2 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               Farm Management
             </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               {[
                 { icon: Store, label: 'My Marketplaces', route: '/vendor/marketplaces', color: 'purple' },
-                { icon: Plus, label: 'Add Product', route: '/vendor/products/add', color: 'purple' },
-                { icon: Package, label: 'Manage Inventory', route: '/vendor/inventory', color: 'purple' },
-                { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'purple' }
+                { icon: Package, label: 'Manage Inventory', route: '/vendor/inventory', color: 'purple' }
               ].map((action, index) => (
                 <motion.button
                   key={action.label}
@@ -399,7 +384,7 @@ export default function VendorDashboard() {
                   className={`group relative overflow-hidden p-6 rounded-3xl backdrop-blur-xl border transition-all duration-500 shadow-lg ${
                     isDarkMode 
                       ? 'bg-purple-900/40 border-purple-700/50 hover:bg-purple-900/50 hover:border-purple-600/50' 
-                      : 'bg-white/70 border-purple-200/80 hover:bg-white/80 hover:border-purple-300/80 hover:shadow-xl'
+                      : 'bg-white/60 border-purple-300/80 hover:bg-white/70 hover:border-purple-400/80 hover:shadow-xl'
                   }`}
                 >
                   <motion.div 
@@ -428,7 +413,7 @@ export default function VendorDashboard() {
               className={`backdrop-blur-xl rounded-3xl border p-6 shadow-lg ${
                 isDarkMode 
                   ? 'bg-purple-900/40 border-purple-700/50' 
-                  : 'bg-white/70 border-purple-200/80'
+                  : 'bg-white/60 border-purple-300/80'
               }`}
             >
               <div className="flex items-center justify-between mb-6">
@@ -450,7 +435,7 @@ export default function VendorDashboard() {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.9 + 0.1 * index }}
                     className={`flex items-center justify-between p-3 rounded-2xl backdrop-blur-sm ${
-                      isDarkMode ? 'bg-purple-800/40' : 'bg-purple-100/50'
+                      isDarkMode ? 'bg-purple-800/40' : 'bg-purple-200/40'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -490,7 +475,7 @@ export default function VendorDashboard() {
               className={`backdrop-blur-xl rounded-3xl border p-6 shadow-lg ${
                 isDarkMode 
                   ? 'bg-purple-900/40 border-purple-700/50' 
-                  : 'bg-white/70 border-purple-200/80'
+                  : 'bg-white/60 border-purple-300/80'
               }`}
             >
               <div className="flex items-center justify-between mb-6">

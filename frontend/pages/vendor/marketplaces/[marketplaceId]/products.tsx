@@ -221,21 +221,68 @@ export default function ProductsManagement() {
   }
 
   return (
-    <div className={`min-h-screen transition-all duration-700 ${
+    <div className={`min-h-screen relative transition-all duration-700 overflow-hidden ${
       isDarkMode 
         ? 'bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900' 
-        : 'bg-gradient-to-br from-purple-100 via-pink-50 to-fuchsia-100'
+        : 'bg-gradient-to-br from-purple-100 via-pink-100 to-fuchsia-100'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Animated gradient blobs */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          x: [0, 50, 0],
+          y: [0, 30, 0],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{
+          scale: [1, 1.3, 1],
+          x: [0, -30, 0],
+          y: [0, 50, 0],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute top-1/2 right-0 w-96 h-96 bg-gradient-to-br from-fuchsia-400/30 to-purple-400/30 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{
+          scale: [1, 1.1, 1],
+          x: [0, 40, 0],
+          y: [0, -40, 0],
+        }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute bottom-0 left-1/3 w-96 h-96 bg-gradient-to-br from-pink-400/30 to-fuchsia-400/30 rounded-full blur-3xl"
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Header */}
         <div className="mb-8">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02, x: -5 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => router.push('/vendor/marketplaces')}
-            className={`flex items-center space-x-2 mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-600`}
+            className={`mb-6 flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+              isDarkMode 
+                ? 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm' 
+                : 'bg-white/80 hover:bg-white text-gray-700 shadow-md hover:shadow-lg'
+            }`}
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Back to Marketplaces</span>
-          </button>
+            <span className="font-medium">Back to Marketplaces</span>
+          </motion.button>
           
           <div className="flex justify-between items-center">
             <div>
@@ -283,10 +330,10 @@ export default function ProductsManagement() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`rounded-3xl p-6 backdrop-blur-xl border ${
+                className={`rounded-3xl p-6 backdrop-blur-xl border shadow-lg ${
                   isDarkMode
                     ? 'bg-purple-800/20 border-purple-700/30'
-                    : 'bg-purple-50/60 border-purple-200/60'
+                    : 'bg-white/60 border-purple-300/80'
                 }`}
               >
                 <div className="flex justify-between items-start mb-4">
