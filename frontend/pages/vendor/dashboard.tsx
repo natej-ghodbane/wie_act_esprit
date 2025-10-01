@@ -19,7 +19,8 @@ import {
   Edit,
   Star,
   Calendar,
-  ArrowUpRight
+  ArrowUpRight,
+  Store
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -77,7 +78,7 @@ export default function VendorDashboard() {
       <div className={`min-h-screen flex items-center justify-center transition-all duration-700 ${
         isDarkMode 
           ? 'bg-gradient-to-br from-slate-900 via-green-900/20 to-slate-900' 
-          : 'bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-teal-50/50'
+          : 'bg-gradient-to-br from-pink-50/50 via-purple-50/30 to-fuchsia-50/50'
       }`}>
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
@@ -98,7 +99,7 @@ export default function VendorDashboard() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className={`text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2`}
+            className={`text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2`}
           >
             Loading your farm dashboard...
           </motion.h2>
@@ -122,17 +123,22 @@ export default function VendorDashboard() {
   return (
     <div className={`min-h-screen transition-all duration-700 ${
       isDarkMode 
-        ? 'bg-gradient-to-br from-slate-900 via-green-900/20 to-slate-900' 
-        : 'bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-teal-50/50'
+        ? 'bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900' 
+        : 'bg-gradient-to-br from-purple-100 via-pink-50 to-fuchsia-100'
     }`}>
+      {/* Purple tinted overlay for light mode */}
+      {!isDarkMode && (
+        <div className="fixed inset-0 bg-gradient-to-br from-purple-200/20 via-pink-100/10 to-fuchsia-200/20 pointer-events-none" />
+      )}
+      
       {/* Advanced Navigation Bar with Glassmorphism */}
       <motion.nav 
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className={`fixed w-full top-0 z-50 backdrop-blur-xl border-b transition-all duration-500 ${
           isDarkMode 
-            ? 'bg-slate-900/10 border-slate-700/30' 
-            : 'bg-white/10 border-white/20'
+            ? 'bg-purple-900/10 border-purple-700/30' 
+            : 'bg-purple-100/30 border-purple-200/40'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -140,12 +146,12 @@ export default function VendorDashboard() {
             {/* Logo with Animation */}
             <motion.div 
               whileHover={{ scale: 1.05 }}
-              className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent flex items-center space-x-3"
+              className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center space-x-3"
             >
               <motion.div 
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-10 h-10 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-green-500/25"
+                className="w-10 h-10 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25"
               >
                 <Leaf className="text-white w-5 h-5" />
               </motion.div>
@@ -160,8 +166,8 @@ export default function VendorDashboard() {
                 animate={{ width: 'auto', opacity: 1 }}
                 className={`hidden md:flex items-center space-x-2 px-4 py-2 rounded-full backdrop-blur-xl border transition-all duration-300 ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50 text-slate-300' 
-                    : 'bg-white/20 border-white/30 text-slate-700'
+                    ? 'bg-purple-800/30 border-purple-700/50 text-purple-300' 
+                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
                 }`}
               >
                 <Search className="w-4 h-4" />
@@ -176,7 +182,7 @@ export default function VendorDashboard() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full hover:shadow-lg hover:shadow-green-500/25 transition-all duration-300 font-medium text-sm flex items-center space-x-2"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 font-medium text-sm flex items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Add Product</span>
@@ -189,8 +195,8 @@ export default function VendorDashboard() {
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className={`p-2 rounded-full backdrop-blur-xl border transition-all duration-300 ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50 text-yellow-400' 
-                    : 'bg-white/20 border-white/30 text-slate-600'
+                    ? 'bg-purple-800/30 border-purple-700/50 text-yellow-400' 
+                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
                 }`}
                 aria-label="Toggle theme"
               >
@@ -204,8 +210,8 @@ export default function VendorDashboard() {
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 className={`relative p-2 rounded-full backdrop-blur-xl border transition-all duration-300 ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50 text-slate-300' 
-                    : 'bg-white/20 border-white/30 text-slate-600'
+                    ? 'bg-purple-800/30 border-purple-700/50 text-purple-300' 
+                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
                 }`}
                 aria-label="Notifications"
               >
@@ -238,7 +244,7 @@ export default function VendorDashboard() {
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2`}
+                  className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 bg-clip-text text-transparent mb-2`}
                 >
                   Welcome, {user?.firstName}! 🌱
                 </motion.h1>
@@ -259,8 +265,8 @@ export default function VendorDashboard() {
                 transition={{ delay: 0.4 }}
                 className={`flex items-center space-x-2 mt-4 lg:mt-0 px-4 py-2 rounded-2xl backdrop-blur-xl border ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50 text-slate-300' 
-                    : 'bg-white/20 border-white/30 text-slate-700'
+                    ? 'bg-purple-800/30 border-purple-700/50 text-purple-300' 
+                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
                 }`}
               >
                 <Leaf className="w-4 h-4 text-green-500" />
@@ -287,8 +293,8 @@ export default function VendorDashboard() {
                 whileHover={{ y: -5, scale: 1.02 }}
                 className={`relative overflow-hidden backdrop-blur-xl rounded-3xl border transition-all duration-500 group ${
                   isDarkMode 
-                    ? 'bg-slate-800/20 border-slate-700/30 hover:bg-slate-800/30' 
-                    : 'bg-white/30 border-white/40 hover:bg-white/40'
+                    ? 'bg-purple-800/20 border-purple-700/30 hover:bg-purple-800/30' 
+                    : 'bg-purple-50/60 border-purple-200/60 hover:bg-purple-100/70'
                 }`}
               >
                 <div className="p-6">
@@ -335,9 +341,9 @@ export default function VendorDashboard() {
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { icon: Plus, label: 'Add Product', route: '/vendor/products/add', color: 'green' },
-                { icon: Package, label: 'Manage Inventory', route: '/vendor/inventory', color: 'blue' },
-                { icon: BarChart3, label: 'Sales Analytics', route: '/vendor/analytics', color: 'purple' },
+                { icon: Store, label: 'My Marketplaces', route: '/vendor/marketplaces', color: 'green' },
+                { icon: Plus, label: 'Add Product', route: '/vendor/products/add', color: 'blue' },
+                { icon: Package, label: 'Manage Inventory', route: '/vendor/inventory', color: 'purple' },
                 { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'amber' }
               ].map((action, index) => (
                 <motion.button
@@ -350,8 +356,8 @@ export default function VendorDashboard() {
                   onClick={() => router.push(action.route)}
                   className={`group relative overflow-hidden p-6 rounded-3xl backdrop-blur-xl border transition-all duration-500 ${
                     isDarkMode 
-                      ? 'bg-slate-800/20 border-slate-700/30 hover:bg-slate-800/40' 
-                      : 'bg-white/30 border-white/40 hover:bg-white/50'
+                      ? 'bg-purple-800/20 border-purple-700/30 hover:bg-purple-800/40' 
+                      : 'bg-purple-50/60 border-purple-200/60 hover:bg-purple-100/70'
                   }`}
                 >
                   <motion.div 
@@ -379,8 +385,8 @@ export default function VendorDashboard() {
               transition={{ delay: 0.8 }}
               className={`backdrop-blur-xl rounded-3xl border p-6 ${
                 isDarkMode 
-                  ? 'bg-slate-800/20 border-slate-700/30' 
-                  : 'bg-white/30 border-white/40'
+                  ? 'bg-purple-800/20 border-purple-700/30' 
+                  : 'bg-purple-50/60 border-purple-200/60'
               }`}
             >
               <div className="flex items-center justify-between mb-6">
@@ -402,7 +408,7 @@ export default function VendorDashboard() {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.9 + 0.1 * index }}
                     className={`flex items-center justify-between p-3 rounded-2xl ${
-                      isDarkMode ? 'bg-slate-800/30' : 'bg-white/20'
+                      isDarkMode ? 'bg-purple-800/30' : 'bg-purple-100/40'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -441,8 +447,8 @@ export default function VendorDashboard() {
               transition={{ delay: 0.8 }}
               className={`backdrop-blur-xl rounded-3xl border p-6 ${
                 isDarkMode 
-                  ? 'bg-slate-800/20 border-slate-700/30' 
-                  : 'bg-white/30 border-white/40'
+                  ? 'bg-purple-800/20 border-purple-700/30' 
+                  : 'bg-purple-50/60 border-purple-200/60'
               }`}
             >
               <div className="flex items-center justify-between mb-6">
@@ -470,16 +476,16 @@ export default function VendorDashboard() {
                       </span>
                     </div>
                     <div className={`h-2 rounded-full overflow-hidden ${
-                      isDarkMode ? 'bg-slate-800/50' : 'bg-white/30'
+                      isDarkMode ? 'bg-purple-800/50' : 'bg-purple-100/40'
                     }`}>
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.floor(Math.random() * 80 + 20)}%` }}
                         transition={{ delay: 1.2 + 0.2 * index, duration: 1 }}
                         className={`h-full bg-gradient-to-r ${
-                          index === 0 ? 'from-green-500 to-emerald-500' :
-                          index === 1 ? 'from-blue-500 to-cyan-500' :
-                          index === 2 ? 'from-purple-500 to-pink-500' :
+                          index === 0 ? 'from-purple-500 to-pink-500' :
+                          index === 1 ? 'from-pink-500 to-fuchsia-500' :
+                          index === 2 ? 'from-purple-500 to-fuchsia-500' :
                           'from-amber-500 to-orange-500'
                         }`}
                       />

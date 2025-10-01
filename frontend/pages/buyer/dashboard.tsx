@@ -18,7 +18,8 @@ import {
   Leaf,
   Sun,
   Moon,
-  Sparkles
+  Sparkles,
+  Store
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -75,7 +76,7 @@ export default function BuyerDashboard() {
       <div className={`min-h-screen flex items-center justify-center transition-all duration-700 ${
         isDarkMode 
           ? 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900' 
-          : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50'
+          : 'bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-50'
       }`}>
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
@@ -86,17 +87,17 @@ export default function BuyerDashboard() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className={`w-16 h-16 mx-auto rounded-full border-4 border-t-emerald-500 border-r-transparent border-b-emerald-300 border-l-transparent ${
-                isDarkMode ? 'shadow-emerald-500/20' : 'shadow-emerald-500/30'
+              className={`w-16 h-16 mx-auto rounded-full border-4 border-t-purple-500 border-r-transparent border-b-pink-300 border-l-transparent ${
+                isDarkMode ? 'shadow-purple-500/20' : 'shadow-purple-500/30'
               } shadow-lg`}
             />
-            <Sparkles className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-emerald-500" />
+            <Sparkles className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-purple-500" />
           </div>
           <motion.h2 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className={`text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2`}
+            className={`text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2`}
           >
             Loading your dashboard...
           </motion.h2>
@@ -121,16 +122,21 @@ export default function BuyerDashboard() {
     <div className={`min-h-screen transition-all duration-700 ${
       isDarkMode 
         ? 'bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900' 
-        : 'bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-cyan-50/50'
+        : 'bg-gradient-to-br from-purple-100 via-pink-50 to-fuchsia-100'
     }`}>
+      {/* Purple tinted overlay for light mode */}
+      {!isDarkMode && (
+        <div className="fixed inset-0 bg-gradient-to-br from-purple-200/20 via-pink-100/10 to-fuchsia-200/20 pointer-events-none z-0" />
+      )}
+      
       {/* Advanced Navigation Bar with Glassmorphism */}
       <motion.nav 
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className={`fixed w-full top-0 z-50 backdrop-blur-xl border-b transition-all duration-500 ${
           isDarkMode 
-            ? 'bg-slate-900/10 border-slate-700/30' 
-            : 'bg-white/10 border-white/20'
+            ? 'bg-purple-900/10 border-purple-700/30' 
+            : 'bg-purple-100/30 border-purple-200/40'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -138,12 +144,12 @@ export default function BuyerDashboard() {
             {/* Logo with Animation */}
             <motion.div 
               whileHover={{ scale: 1.05 }}
-              className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent flex items-center space-x-3"
+              className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center space-x-3"
             >
               <motion.div 
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className="w-10 h-10 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/25"
+                className="w-10 h-10 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25"
               >
                 <Leaf className="text-white w-5 h-5" />
               </motion.div>
@@ -158,8 +164,8 @@ export default function BuyerDashboard() {
                 animate={{ width: 'auto', opacity: 1 }}
                 className={`hidden md:flex items-center space-x-2 px-4 py-2 rounded-full backdrop-blur-xl border transition-all duration-300 ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50 text-slate-300' 
-                    : 'bg-white/20 border-white/30 text-slate-700'
+                    ? 'bg-purple-800/30 border-purple-700/50 text-purple-300' 
+                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
                 }`}
               >
                 <Search className="w-4 h-4" />
@@ -177,8 +183,8 @@ export default function BuyerDashboard() {
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className={`p-2 rounded-full backdrop-blur-xl border transition-all duration-300 ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50 text-yellow-400' 
-                    : 'bg-white/20 border-white/30 text-slate-600'
+                    ? 'bg-purple-800/30 border-purple-700/50 text-yellow-400' 
+                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
                 }`}
                 aria-label="Toggle theme"
               >
@@ -192,8 +198,8 @@ export default function BuyerDashboard() {
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 className={`relative p-2 rounded-full backdrop-blur-xl border transition-all duration-300 ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50 text-slate-300' 
-                    : 'bg-white/20 border-white/30 text-slate-600'
+                    ? 'bg-purple-800/30 border-purple-700/50 text-purple-300' 
+                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
                 }`}
                 aria-label="Notifications"
               >
@@ -226,7 +232,7 @@ export default function BuyerDashboard() {
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2`}
+                  className={`text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 bg-clip-text text-transparent mb-2`}
                 >
                   Welcome back, {user?.firstName}! 👋
                 </motion.h1>
@@ -247,8 +253,8 @@ export default function BuyerDashboard() {
                 transition={{ delay: 0.4 }}
                 className={`flex items-center space-x-2 mt-4 lg:mt-0 p-1 rounded-2xl backdrop-blur-xl border ${
                   isDarkMode 
-                    ? 'bg-slate-800/30 border-slate-700/50' 
-                    : 'bg-white/20 border-white/30'
+                    ? 'bg-purple-800/30 border-purple-700/50' 
+                    : 'bg-purple-100/40 border-purple-200/50'
                 }`}
               >
                 {['day', 'week', 'month'].map((period) => (
@@ -259,7 +265,7 @@ export default function BuyerDashboard() {
                     onClick={() => setSelectedTimeframe(period)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                       selectedTimeframe === period
-                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
                         : isDarkMode 
                           ? 'text-slate-400 hover:text-slate-200' 
                           : 'text-slate-600 hover:text-slate-800'
@@ -288,8 +294,8 @@ export default function BuyerDashboard() {
                 whileHover={{ y: -5, scale: 1.02 }}
                 className={`relative overflow-hidden backdrop-blur-xl rounded-3xl border transition-all duration-500 group ${
                   isDarkMode 
-                    ? 'bg-slate-800/20 border-slate-700/30 hover:bg-slate-800/30' 
-                    : 'bg-white/30 border-white/40 hover:bg-white/40'
+                    ? 'bg-purple-800/20 border-purple-700/30 hover:bg-purple-800/30' 
+                    : 'bg-purple-50/60 border-purple-200/60 hover:bg-purple-100/70'
                 }`}
                 style={{
                   boxShadow: isDarkMode 
@@ -311,7 +317,7 @@ export default function BuyerDashboard() {
                       animate={{ opacity: 1 }}
                       className={`text-xs font-medium px-2 py-1 rounded-full ${
                         stat.change.startsWith('+') 
-                          ? `bg-emerald-500/20 text-emerald-600` 
+                          ? `bg-purple-500/20 text-purple-600` 
                           : `bg-rose-500/20 text-rose-600`
                       }`}
                     >
@@ -348,7 +354,7 @@ export default function BuyerDashboard() {
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { icon: Search, label: 'Browse Products', route: '/marketplace', color: 'emerald' },
+                { icon: Store, label: 'Browse Marketplaces', route: '/buyer/marketplaces', color: 'emerald' },
                 { icon: ShoppingBag, label: 'My Cart', route: '/cart', color: 'blue' },
                 { icon: Package, label: 'Order History', route: '/orders', color: 'purple' },
                 { icon: Bookmark, label: 'Saved Items', route: '/saved', color: 'rose' }
@@ -363,8 +369,8 @@ export default function BuyerDashboard() {
                   onClick={() => router.push(action.route)}
                   className={`group relative overflow-hidden p-6 rounded-3xl backdrop-blur-xl border transition-all duration-500 ${
                     isDarkMode 
-                      ? 'bg-slate-800/20 border-slate-700/30 hover:bg-slate-800/40' 
-                      : 'bg-white/30 border-white/40 hover:bg-white/50'
+                      ? 'bg-purple-800/20 border-purple-700/30 hover:bg-purple-800/40' 
+                      : 'bg-purple-50/60 border-purple-200/60 hover:bg-purple-100/70'
                   }`}
                 >
                   <motion.div 
@@ -392,8 +398,8 @@ export default function BuyerDashboard() {
               transition={{ delay: 0.8 }}
               className={`backdrop-blur-xl rounded-3xl border p-6 ${
                 isDarkMode 
-                  ? 'bg-slate-800/20 border-slate-700/30' 
-                  : 'bg-white/30 border-white/40'
+                  ? 'bg-purple-800/20 border-purple-700/30' 
+                  : 'bg-purple-50/60 border-purple-200/60'
               }`}
             >
               <div className="flex items-center justify-between mb-6">
@@ -415,14 +421,14 @@ export default function BuyerDashboard() {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.9 + 0.1 * index }}
                     className={`flex items-center space-x-4 p-3 rounded-2xl ${
-                      isDarkMode ? 'bg-slate-800/30' : 'bg-white/20'
+                      isDarkMode ? 'bg-purple-800/30' : 'bg-purple-100/40'
                     }`}
                   >
                     <motion.div 
                       whileHover={{ scale: 1.1 }}
                       className={`w-2 h-2 rounded-full ${
                         activity.status === 'completed' 
-                          ? 'bg-emerald-500' 
+                          ? 'bg-purple-500' 
                           : 'bg-amber-500'
                       }`}
                     />
@@ -447,8 +453,8 @@ export default function BuyerDashboard() {
               transition={{ delay: 0.8 }}
               className={`backdrop-blur-xl rounded-3xl border p-6 ${
                 isDarkMode 
-                  ? 'bg-slate-800/20 border-slate-700/30' 
-                  : 'bg-white/30 border-white/40'
+                  ? 'bg-purple-800/20 border-purple-700/30' 
+                  : 'bg-purple-50/60 border-purple-200/60'
               }`}
             >
               <div className="flex items-center justify-between mb-6">
@@ -476,16 +482,16 @@ export default function BuyerDashboard() {
                       </span>
                     </div>
                     <div className={`h-2 rounded-full overflow-hidden ${
-                      isDarkMode ? 'bg-slate-800/50' : 'bg-white/30'
+                      isDarkMode ? 'bg-purple-800/50' : 'bg-purple-100/40'
                     }`}>
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.floor(Math.random() * 80 + 20)}%` }}
                         transition={{ delay: 1.2 + 0.2 * index, duration: 1 }}
                         className={`h-full bg-gradient-to-r ${
-                          index === 0 ? 'from-emerald-500 to-teal-500' :
-                          index === 1 ? 'from-blue-500 to-cyan-500' :
-                          index === 2 ? 'from-purple-500 to-pink-500' :
+                          index === 0 ? 'from-purple-500 to-pink-500' :
+                          index === 1 ? 'from-pink-500 to-fuchsia-500' :
+                          index === 2 ? 'from-purple-500 to-fuchsia-500' :
                           'from-amber-500 to-orange-500'
                         }`}
                       />
