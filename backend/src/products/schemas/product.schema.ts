@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -20,11 +20,17 @@ export class Product {
   @Prop({ type: [String], default: [] })
   images: string[];
 
-  @Prop({ required: true })
-  vendorId: string;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
+  vendorId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Marketplace', required: true, index: true })
+  marketplaceId: Types.ObjectId;
 
   @Prop({ default: 0 })
   inventory: number;
+
+  @Prop()
+  unit?: string;
 
   @Prop({ default: true })
   isActive: boolean;

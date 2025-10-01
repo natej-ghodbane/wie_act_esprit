@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import { AnimatePresence } from 'framer-motion';
 import '../styles/globals.css';
@@ -8,18 +8,43 @@ import WelcomeScreen from './WelcomeScreen';
 import { useRouter } from 'next/router';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [showWelcome, setShowWelcome] = useState(true);
   const router = useRouter();
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Hide global chrome (Navbar/background/footer) on app sections that provide their own layout
   const pathname = router.pathname || '';
-  const hideGlobalChrome = pathname.startsWith('/buyer') || pathname.startsWith('/vendor');
+  const hideGlobalChrome = pathname.startsWith('/buyer') || pathname.startsWith('/vendor') || pathname.startsWith('/auth');
+
+  useEffect(() => {
+    // Only show welcome screen on the home page and if it hasn't been shown before
+    const welcomeShown = typeof window !== 'undefined' ? sessionStorage.getItem('welcomeShown') : null;
+    const isHomePage = pathname === '/' || pathname === '';
+    
+    if (!welcomeShown && isHomePage) {
+      setShowWelcome(true);
+    }
+    
+    setHasInitialized(true);
+  }, [pathname]);
+
+  const handleWelcomeComplete = () => {
+    setShowWelcome(false);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('welcomeShown', 'true');
+    }
+  };
+
+  // Don't render anything until we've determined whether to show welcome screen
+  if (!hasInitialized) {
+    return null;
+  }
 
   return (
     <>
       <AnimatePresence mode="wait">
         {showWelcome && (
-          <WelcomeScreen onLoadingComplete={() => setShowWelcome(false)} />
+          <WelcomeScreen onLoadingComplete={handleWelcomeComplete} />
         )}
       </AnimatePresence>
 

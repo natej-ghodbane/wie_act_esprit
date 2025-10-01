@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { 
+  Eye, EyeOff, User, Mail, Phone, Lock, MapPin, Camera, 
+  CheckCircle, Shield, ArrowRight, Sparkles, UserCheck, 
+  Briefcase, Sprout
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Head from 'next/head';
 
 interface SignupFormData {
   firstName: string;
@@ -22,12 +29,17 @@ export default function SignupPage() {
     phone: '',
     password: '',
     confirmPassword: '',
-    role: 'farmer',
+    role: '' as any, // Force user to explicitly select a role
   });
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedCountryCode, setSelectedCountryCode] = useState('+1');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({
     hasLowercase: false,
     hasUppercase: false,
@@ -36,6 +48,11 @@ export default function SignupPage() {
     hasMinLength: false,
     score: 0
   });
+
+  useEffect(() => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(prefersDark);
+  }, []);
 
   // Country codes data
   const countryCodes = [
@@ -383,243 +400,653 @@ export default function SignupPage() {
     }
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const nextStep = () => {
+    if (currentStep < 3) setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  const getStepFields = (step: number) => {
+    switch (step) {
+      case 1:
+        return ['firstName', 'lastName', 'email'];
+      case 2:
+        return ['phone', 'password', 'confirmPassword'];
+      case 3:
+        return ['role', 'farmLocation'];
+      default:
+        return [];
+    }
+  };
+
+  const isStepValid = (step: number) => {
+    const fields = getStepFields(step);
+    return fields.every(field => {
+      if (field === 'farmLocation' && formData.role !== 'farmer') return true;
+      if (field === 'role') {
+        // Ensure role is explicitly selected (not empty string)
+        return formData.role === 'farmer' || formData.role === 'buyer';
+      }
+      return formData[field as keyof SignupFormData] && 
+             String(formData[field as keyof SignupFormData]).trim() !== '';
+    });
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 via-rose-200 to-orange-200 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-pink-300/30 to-rose-300/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-300/30 to-yellow-300/30 rounded-full blur-3xl"></div>
-      </div>
-      
-      <div className="relative z-10 max-w-md w-full space-y-8">
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-pink-200/20">
-          <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-              🌾 Join AGRI-HOPE
-            </h2>
-            <p className="mt-2 text-sm text-gray-700">
-              Create your agricultural marketplace account
-            </p>
+    <>
+      <Head>
+        <title>Sign Up - AGRI-HOPE | Join the Agricultural Revolution</title>
+        <meta name="description" content="Join AGRI-HOPE and connect with the future of agricultural commerce." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+
+      <div className={`min-h-screen transition-all duration-700 ${isDarkMode ? 'dark' : ''}`}>
+        {/* Animated Background */}
+        <div className="fixed inset-0 bg-gradient-to-br from-pink-50 via-purple-50 to-fuchsia-50 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900">
+          {/* Floating Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <motion.div
+              animate={{
+                x: [0, 150, 0],
+                y: [0, -120, 0],
+                rotate: [0, 270, 360],
+              }}
+              transition={{
+                duration: 25,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute top-20 left-20 w-40 h-40 bg-gradient-to-r from-purple-300/20 to-pink-300/20 rounded-full blur-xl"
+            />
+            <motion.div
+              animate={{
+                x: [0, -100, 0],
+                y: [0, 100, 0],
+                rotate: [360, 180, 0],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute bottom-20 right-20 w-32 h-32 bg-gradient-to-r from-pink-300/20 to-fuchsia-300/20 rounded-full blur-xl"
+            />
+            <motion.div
+              animate={{
+                x: [0, 80, 0],
+                y: [0, -80, 0],
+                scale: [1, 1.3, 1],
+              }}
+              transition={{
+                duration: 18,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute top-1/2 right-1/4 w-28 h-28 bg-gradient-to-r from-fuchsia-300/20 to-purple-300/20 rounded-full blur-lg"
+            />
           </div>
 
-          {/* User Type Selection */}
-          <div className="mt-6 flex rounded-lg bg-white/30 backdrop-blur-sm p-1">
-            <button
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, role: 'farmer' }))}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                formData.role === 'farmer'
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                  : 'text-gray-700 hover:text-gray-900'
-              }`}
-            >
-              🚜 Farmer
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, role: 'buyer' }))}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                formData.role === 'buyer'
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                  : 'text-gray-700 hover:text-gray-900'
-              }`}
-            >
-              🏪 Buyer
-            </button>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                {error}
-              </div>
+          {/* Mesh Gradient Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(99,102,241,0.1),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_70%,rgba(67,56,202,0.2),transparent_50%)]" />
+        </div>
+
+        {/* Dark Mode Toggle */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleDarkMode}
+          className="fixed top-6 right-6 z-50 p-3 bg-white/10 dark:bg-gray-800/10 backdrop-blur-md rounded-full border border-white/20 dark:border-gray-700/20 shadow-lg"
+          aria-label="Toggle dark mode"
+        >
+          <motion.div
+            animate={{ rotate: isDarkMode ? 180 : 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {isDarkMode ? (
+              <div className="w-6 h-6 bg-yellow-300 rounded-full shadow-lg" />
+            ) : (
+              <div className="w-6 h-6 bg-gray-700 rounded-full shadow-lg" />
             )}
-            
-            <div className="space-y-4">
-              {/* Profile Image Upload */}
-              <div className="flex flex-col items-center space-y-4">
-                <div className="relative">
-                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                    {imagePreview ? (
-                      <img src={imagePreview} alt="Profile preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="text-gray-400 text-2xl">📸</div>
+          </motion.div>
+        </motion.button>
+
+        {/* Main Content */}
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="w-full max-w-lg"
+          >
+            {/* Progress Indicator */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className="flex items-center">
+                    <motion.div
+                      animate={{
+                        scale: currentStep === step ? 1.2 : 1,
+                        backgroundColor: currentStep >= step ? '#8B5CF6' : '#E5E7EB'
+                      }}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${
+                        currentStep >= step ? 'bg-purple-600' : 'bg-gray-300'
+                      }`}
+                    >
+                      {currentStep > step ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : (
+                        step
+                      )}
+                    </motion.div>
+                    {step < 3 && (
+                      <div className={`w-16 h-1 mx-2 rounded-full transition-colors duration-300 ${
+                        currentStep > step ? 'bg-purple-600' : 'bg-gray-300'
+                      }`} />
                     )}
                   </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
-                <p className="text-xs text-gray-600">Click to upload profile picture (optional, max 5MB)</p>
+                ))}
               </div>
+              <div className="flex justify-between mt-2 text-xs text-gray-600 dark:text-gray-400">
+                <span>Personal</span>
+                <span>Security</span>
+                <span>Profile</span>
+              </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    placeholder="First name"
-                    required
-                    className="appearance-none relative block w-full px-4 py-3 border border-pink-200/30 placeholder-gray-500 text-gray-900 rounded-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    placeholder="Last name"
-                    required
-                    className="appearance-none relative block w-full px-4 py-3 border border-pink-200/30 placeholder-gray-500 text-gray-900 rounded-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  />
-                </div>
-              </div>
-              <div>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Email address"
-                  required
-                  className="appearance-none relative block w-full px-4 py-3 border border-pink-200/30 placeholder-gray-500 text-gray-900 rounded-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                />
-              </div>
-              <div>
-                <div className="flex">
-                  {/* Country Code Selector */}
-                  <select
-                    value={selectedCountryCode}
-                    onChange={(e) => setSelectedCountryCode(e.target.value)}
-                    className="appearance-none relative block px-3 py-3 border border-pink-200/30 placeholder-gray-500 text-gray-900 rounded-l-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors min-w-[80px]"
-                  >
-                    {countryCodes.map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.flag} {country.code}
-                      </option>
-                    ))}
-                  </select>
-                  
-                  {/* Phone Number Input */}
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="Phone number"
-                    pattern="[0-9]{8,15}"
-                    title="Phone number must be 8-15 digits"
-                    className="appearance-none relative block w-full px-4 py-3 border border-pink-200/30 border-l-0 placeholder-gray-500 text-gray-900 rounded-r-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  />
-                </div>
-              </div>
-              <div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Password (min 8 characters)"
-                  required
-                  className="appearance-none relative block w-full px-4 py-3 border border-pink-200/30 placeholder-gray-500 text-gray-900 rounded-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                />
-                
-                {/* Password Strength Bar */}
-                {formData.password && (
-                  <div className="mt-3">
-                    <div className="flex justify-between text-xs mb-2">
-                      <span className="text-gray-600">Password Strength</span>
-                      <span className={`font-medium ${
-                        passwordStrength.score === 5 ? 'text-green-600' :
-                        passwordStrength.score >= 3 ? 'text-yellow-600' :
-                        'text-red-600'
-                      }`}>
-                        {passwordStrength.score === 5 ? 'Strong' :
-                         passwordStrength.score >= 3 ? 'Medium' :
-                         'Weak'}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200/50 rounded-full h-2 backdrop-blur-sm">
-                      <div 
-                        className={`h-2 rounded-full transition-all duration-500 ease-out ${
-                          passwordStrength.score === 5 ? 'bg-gradient-to-r from-green-400 to-green-600' :
-                          passwordStrength.score >= 3 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                          'bg-gradient-to-r from-red-400 to-red-600'
-                        }`}
-                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm password"
-                  required
-                  className="appearance-none relative block w-full px-4 py-3 border border-pink-200/30 placeholder-gray-500 text-gray-900 rounded-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                />
-              </div>
+            {/* Glassmorphism Container */}
+            <div className="relative">
+              {/* Glowing Border Effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 rounded-3xl blur opacity-25 group-hover:opacity-75 transition duration-1000" />
               
-              {formData.role === 'farmer' && (
-                <div>
-                  <input
-                    type="text"
-                    name="farmLocation"
-                    value={formData.farmLocation || ''}
-                    onChange={handleInputChange}
-                    placeholder="Farm location"
-                    className="appearance-none relative block w-full px-4 py-3 border border-pink-200/30 placeholder-gray-500 text-gray-900 rounded-lg bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  />
-                </div>
-              )}
-            </div>
+              <div className="relative bg-white/20 dark:bg-gray-900/20 backdrop-blur-2xl rounded-3xl p-8 border border-white/30 dark:border-gray-700/30 shadow-2xl">
+                {/* Header */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  className="text-center mb-8"
+                >
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.05, 1],
+                      rotate: [0, -5, 5, 0]
+                    }}
+                    transition={{ 
+                      duration: 4, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="inline-block mb-4"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <UserCheck className="w-8 h-8 text-white" />
+                    </div>
+                  </motion.div>
+                  
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 dark:from-purple-400 dark:via-pink-400 dark:to-fuchsia-400 bg-clip-text text-transparent mb-2">
+                    Join AGRI-HOPE
+                  </h1>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    Create your agricultural marketplace account
+                  </p>
+                </motion.div>
 
-            <div className="flex items-center">
-              <input
-                id="agree-terms"
-                name="agree-terms"
-                type="checkbox"
-                required
-                className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-pink-300 rounded"
-              />
-              <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-700">
-                I agree to the{' '}
-                <a href="#" className="text-pink-600 hover:text-pink-500">
-                  Terms and Conditions
-                </a>
-              </label>
-            </div>
+                {/* Error Messages */}
+                <AnimatePresence>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                      className="mb-6 p-4 bg-red-100 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 rounded-2xl"
+                    >
+                      <p className="text-sm font-medium">{error}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-pink-500 to-rose-500 hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 ${
-                  isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {isLoading ? 'Creating Account...' : 'Create AGRI-HOPE Account'}
-              </button>
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <AnimatePresence mode="wait">
+                    {/* Step 1: Personal Information */}
+                    {currentStep === 1 && (
+                      <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -50 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        {/* Profile Image Upload */}
+                        <div className="flex flex-col items-center space-y-4">
+                          <div className="relative">
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 flex items-center justify-center border-4 border-white/20 shadow-lg cursor-pointer"
+                            >
+                              {imagePreview ? (
+                                <img src={imagePreview} alt="Profile preview" className="w-full h-full object-cover" />
+                              ) : (
+                                <Camera className="w-8 h-8 text-purple-500" />
+                              )}
+                            </motion.div>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageChange}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">Upload profile picture (optional)</p>
+                        </div>
+
+                        {/* Name Fields */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <User className={`w-5 h-5 transition-colors duration-200 ${
+                                focusedField === 'firstName' 
+                                  ? 'text-purple-500' 
+                                  : 'text-gray-400 dark:text-gray-500'
+                              }`} />
+                            </div>
+                            <input
+                              type="text"
+                              name="firstName"
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              onFocus={() => setFocusedField('firstName')}
+                              onBlur={() => setFocusedField(null)}
+                              placeholder="First name"
+                              required
+                              className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 shadow-lg"
+                            />
+                          </div>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <User className={`w-5 h-5 transition-colors duration-200 ${
+                                focusedField === 'lastName' 
+                                  ? 'text-purple-500' 
+                                  : 'text-gray-400 dark:text-gray-500'
+                              }`} />
+                            </div>
+                            <input
+                              type="text"
+                              name="lastName"
+                              value={formData.lastName}
+                              onChange={handleInputChange}
+                              onFocus={() => setFocusedField('lastName')}
+                              onBlur={() => setFocusedField(null)}
+                              placeholder="Last name"
+                              required
+                              className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 shadow-lg"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Email Field */}
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Mail className={`w-5 h-5 transition-colors duration-200 ${
+                              focusedField === 'email' 
+                                ? 'text-purple-500' 
+                                : 'text-gray-400 dark:text-gray-500'
+                            }`} />
+                          </div>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            onFocus={() => setFocusedField('email')}
+                            onBlur={() => setFocusedField(null)}
+                            placeholder="Email address"
+                            required
+                            className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 shadow-lg"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Step 2: Security */}
+                    {currentStep === 2 && (
+                      <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -50 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        {/* Phone Field */}
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Phone className={`w-5 h-5 transition-colors duration-200 ${
+                              focusedField === 'phone' 
+                                ? 'text-purple-500' 
+                                : 'text-gray-400 dark:text-gray-500'
+                            }`} />
+                          </div>
+                          <select
+                            value={selectedCountryCode}
+                            onChange={(e) => setSelectedCountryCode(e.target.value)}
+                            className="absolute inset-y-0 left-12 w-20 bg-transparent text-gray-900 dark:text-white text-sm focus:outline-none"
+                          >
+                            {countryCodes.slice(0, 10).map((country) => (
+                              <option key={country.code} value={country.code}>
+                                {country.code}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            onFocus={() => setFocusedField('phone')}
+                            onBlur={() => setFocusedField(null)}
+                            placeholder="Phone number"
+                            required
+                            className="w-full pl-32 pr-4 py-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 shadow-lg"
+                          />
+                        </div>
+
+                        {/* Password Field */}
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Lock className={`w-5 h-5 transition-colors duration-200 ${
+                              focusedField === 'password' 
+                                ? 'text-purple-500' 
+                                : 'text-gray-400 dark:text-gray-500'
+                            }`} />
+                          </div>
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            onFocus={() => setFocusedField('password')}
+                            onBlur={() => setFocusedField(null)}
+                            placeholder="Password (min 8 characters)"
+                            required
+                            className="w-full pl-12 pr-14 py-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 shadow-lg"
+                          />
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-purple-500 transition-colors duration-200"
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </motion.button>
+                        </div>
+
+                        {/* Password Strength Indicator */}
+                        {formData.password && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="space-y-2"
+                          >
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-600 dark:text-gray-400">Password Strength</span>
+                              <span className={`font-medium ${
+                                passwordStrength.score === 5 ? 'text-green-500' :
+                                passwordStrength.score >= 3 ? 'text-yellow-500' :
+                                'text-red-500'
+                              }`}>
+                                {passwordStrength.score === 5 ? 'Strong' :
+                                 passwordStrength.score >= 3 ? 'Medium' :
+                                 'Weak'}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200/50 dark:bg-gray-700/50 rounded-full h-2">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                                transition={{ duration: 0.5 }}
+                                className={`h-2 rounded-full transition-colors duration-300 ${
+                                  passwordStrength.score === 5 ? 'bg-gradient-to-r from-green-400 to-green-600' :
+                                  passwordStrength.score >= 3 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                                  'bg-gradient-to-r from-red-400 to-red-600'
+                                }`}
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {/* Confirm Password Field */}
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Shield className={`w-5 h-5 transition-colors duration-200 ${
+                              focusedField === 'confirmPassword' 
+                                ? 'text-purple-500' 
+                                : 'text-gray-400 dark:text-gray-500'
+                            }`} />
+                          </div>
+                          <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleInputChange}
+                            onFocus={() => setFocusedField('confirmPassword')}
+                            onBlur={() => setFocusedField(null)}
+                            placeholder="Confirm password"
+                            required
+                            className="w-full pl-12 pr-14 py-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 shadow-lg"
+                          />
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-purple-500 transition-colors duration-200"
+                          >
+                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Step 3: Profile Setup */}
+                    {currentStep === 3 && (
+                      <motion.div
+                        key="step3"
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -50 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-6"
+                      >
+                        {/* Role Selection */}
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-white text-center">Choose your role</h3>
+                          <div className="grid grid-cols-2 gap-4">
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              type="button"
+                              onClick={() => setFormData(prev => ({ ...prev, role: 'farmer' }))}
+                              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${
+                                formData.role === 'farmer'
+                                  ? 'border-purple-500 bg-purple-500/10 dark:bg-purple-500/20'
+                                  : 'border-white/20 dark:border-gray-700/20 bg-white/5 dark:bg-gray-800/5'
+                              }`}
+                            >
+                              <Sprout className={`w-8 h-8 mx-auto mb-3 ${
+                                formData.role === 'farmer' ? 'text-purple-500' : 'text-gray-400'
+                              }`} />
+                              <div className="text-center">
+                                <h4 className="font-semibold text-gray-900 dark:text-white">Farmer</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Sell your produce</p>
+                              </div>
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              type="button"
+                              onClick={() => setFormData(prev => ({ ...prev, role: 'buyer' }))}
+                              className={`p-6 rounded-2xl border-2 transition-all duration-200 ${
+                                formData.role === 'buyer'
+                                  ? 'border-purple-500 bg-purple-500/10 dark:bg-purple-500/20'
+                                  : 'border-white/20 dark:border-gray-700/20 bg-white/5 dark:bg-gray-800/5'
+                              }`}
+                            >
+                              <Briefcase className={`w-8 h-8 mx-auto mb-3 ${
+                                formData.role === 'buyer' ? 'text-purple-500' : 'text-gray-400'
+                              }`} />
+                              <div className="text-center">
+                                <h4 className="font-semibold text-gray-900 dark:text-white">Buyer</h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Purchase fresh goods</p>
+                              </div>
+                            </motion.button>
+                          </div>
+                        </div>
+
+                        {/* Farm Location (if farmer) */}
+                        <AnimatePresence>
+                          {formData.role === 'farmer' && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="relative"
+                            >
+                              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <MapPin className={`w-5 h-5 transition-colors duration-200 ${
+                                  focusedField === 'farmLocation' 
+                                    ? 'text-purple-500' 
+                                    : 'text-gray-400 dark:text-gray-500'
+                                }`} />
+                              </div>
+                              <input
+                                type="text"
+                                name="farmLocation"
+                                value={formData.farmLocation || ''}
+                                onChange={handleInputChange}
+                                onFocus={() => setFocusedField('farmLocation')}
+                                onBlur={() => setFocusedField(null)}
+                                placeholder="Farm location"
+                                className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 shadow-lg"
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {/* Terms and Conditions */}
+                        <div className="flex items-start space-x-3">
+                          <input
+                            id="agree-terms"
+                            name="agree-terms"
+                            type="checkbox"
+                            required
+                            className="mt-1 h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded transition-colors duration-200"
+                          />
+                          <label htmlFor="agree-terms" className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                            I agree to the{' '}
+                            <a href="#" className="text-purple-600 dark:text-purple-400 hover:text-purple-500 font-medium transition-colors duration-200">
+                              Terms and Conditions
+                            </a>{' '}
+                            and{' '}
+                            <a href="#" className="text-purple-600 dark:text-purple-400 hover:text-purple-500 font-medium transition-colors duration-200">
+                              Privacy Policy
+                            </a>
+                          </label>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between pt-6">
+                    {currentStep > 1 && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="button"
+                        onClick={prevStep}
+                        className="px-6 py-3 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 rounded-2xl text-gray-700 dark:text-gray-300 font-medium transition-all duration-200 hover:bg-white/20 dark:hover:bg-gray-800/20"
+                      >
+                        ← Previous
+                      </motion.button>
+                    )}
+                    
+                    <div className="flex-1" />
+                    
+                    {currentStep < 3 ? (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="button"
+                        onClick={nextStep}
+                        disabled={!isStepValid(currentStep)}
+                        className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-lg"
+                      >
+                        <span>Continue</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </motion.button>
+                    ) : (
+                      <motion.button
+                        whileHover={{ 
+                          scale: 1.02,
+                          boxShadow: "0 20px 40px rgba(168, 85, 247, 0.4)"
+                        }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        disabled={isLoading}
+                        className="px-8 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 text-white font-semibold rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-xl"
+                      >
+                        {isLoading ? (
+                          <>
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                            />
+                            <span>Creating Account...</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-5 h-5" />
+                            <span>Create Account</span>
+                          </>
+                        )}
+                      </motion.button>
+                    )}
+                  </div>
+
+                  {/* Sign In Link */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7, duration: 0.6 }}
+                    className="text-center pt-6 border-t border-white/10 dark:border-gray-700/10"
+                  >
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
+                      Already have an account?{' '}
+                      <motion.a
+                        whileHover={{ scale: 1.05 }}
+                        href="/auth/login"
+                        className="text-purple-600 dark:text-purple-400 hover:text-pink-500 font-semibold transition-colors duration-200"
+                      >
+                        Sign In →
+                      </motion.a>
+                    </p>
+                  </motion.div>
+                </form>
+              </div>
             </div>
-            
-            <div className="text-center">
-              <a href="/auth/login" className="text-pink-600 hover:text-pink-500 transition-colors">
-                Already have an account? Sign In
-              </a>
-            </div>
-          </form>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

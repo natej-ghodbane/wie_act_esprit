@@ -1,60 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import BuyerSidebar from '../../components/BuyerSidebar';
-import { MarketplacePage as MarketplaceInner } from '../../components/marketplace/MarketplacePage';
-import UserProfileDropdown from '../../components/UserProfileDropdown';
+'use client'
 
-export default function BuyerMarketplacePage() {
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import { MarketplacePage } from '@/components/marketplace/MarketplacePage'
+
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  profileImage?: string;
+}
+
+const BuyerMarketplace = () => {
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
+    // Check authentication
+    const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
+
     if (!token || !userData) {
       router.push('/auth/login');
       return;
     }
+
     try {
-      const parsed = JSON.parse(userData);
-      if (parsed.role !== 'buyer') {
+      const parsedUser = JSON.parse(userData);
+      if (parsedUser.role !== 'buyer') {
         router.push('/auth/login');
+        return;
       }
-      setUser(parsed);
-    } catch {
+      setUser(parsedUser);
+    } catch (error) {
       router.push('/auth/login');
+      return;
     }
+
+    setIsLoading(false);
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    router.push('/');
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-rose-200 to-orange-200">
-      <div className="flex">
-        <BuyerSidebar onLogout={handleLogout} onOpenChange={setSidebarOpen} />
-        <main className={'flex-1 ' + (sidebarOpen ? 'md:ml-64' : '')}>
-          <nav className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-pink-200/50 shadow-sm">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
-                <div className="flex items-center space-x-4">
-                  <h1 className="text-lg font-semibold text-gray-800">Marketplace</h1>
-                </div>
-                <div className="flex items-center space-x-4">
-                  {user && <UserProfileDropdown user={user} />}
-                </div>
-              </div>
-            </div>
-          </nav>
-          <MarketplaceInner />
-        </main>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 via-rose-200 to-orange-200">
+        <div className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
+          Loading...
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  return <MarketplacePage user={user} />;
 }
 
+export default BuyerMarketplace;
