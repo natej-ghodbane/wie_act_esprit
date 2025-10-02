@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import UserProfileDropdown from '../../components/UserProfileDropdown';
 import { 
   Package, 
+  ShoppingBag,
   TrendingUp, 
   DollarSign, 
   Users, 
@@ -371,31 +372,31 @@ export default function VendorDashboard() {
             ))}
           </div>
 
-          {/* Quick Actions for Vendors */}
+          {/* Management Menu */}
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.55 }}
             className="mb-10"
           >
             <h2 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-              Farm Management
+              Management Menu
             </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { icon: Store, label: 'My Marketplaces', route: '/vendor/marketplaces', color: 'purple' },
-                { icon: Plus, label: 'Add Product', route: '/vendor/products/add', color: 'purple' },
-                { icon: Package, label: 'Manage Inventory', route: '/vendor/inventory', color: 'purple' },
-                { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'purple' }
-              ].map((action, index) => (
+                { icon: Package, label: 'Manage Products', route: '/vendor/products', color: 'purple' },
+                { icon: ShoppingBag, label: 'Manage Orders', route: '/vendor/orders', color: 'purple' },
+                { icon: BarChart3, label: 'Financial Statistics', route: '/vendor/finance', color: 'purple' },
+                { icon: Settings, label: 'Settings', route: '/vendor/settings', color: 'purple' }
+              ].map((item, index) => (
                 <motion.button
-                  key={action.label}
+                  key={item.label}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.7 + 0.1 * index }}
+                  transition={{ delay: 0.6 + 0.1 * index }}
                   whileHover={{ y: -5, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => router.push(action.route)}
+                  onClick={() => router.push(item.route)}
                   className={`group relative overflow-hidden p-6 rounded-3xl backdrop-blur-xl border transition-all duration-500 shadow-lg ${
                     isDarkMode 
                       ? 'bg-purple-900/40 border-purple-700/50 hover:bg-purple-900/50 hover:border-purple-600/50' 
@@ -405,12 +406,12 @@ export default function VendorDashboard() {
                   <motion.div 
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.5 }}
-                    className={`w-12 h-12 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-${action.color}-500 to-${action.color}-600 flex items-center justify-center shadow-lg shadow-${action.color}-500/25`}
+                    className={`w-12 h-12 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-${item.color}-500 to-${item.color}-600 flex items-center justify-center shadow-lg shadow-${item.color}-500/25`}
                   >
-                    <action.icon className="w-6 h-6 text-white" />
+                    <item.icon className="w-6 h-6 text-white" />
                   </motion.div>
                   <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                    {action.label}
+                    {item.label}
                   </p>
                   <ArrowUpRight className={`absolute top-4 right-4 w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`} />
                 </motion.button>
@@ -418,6 +419,7 @@ export default function VendorDashboard() {
             </div>
           </motion.div>
 
+          
           {/* Recent Products & Sales Analytics */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Products */}
