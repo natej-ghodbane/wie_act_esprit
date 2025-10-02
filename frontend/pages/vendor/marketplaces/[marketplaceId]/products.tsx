@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast, Toaster } from 'react-hot-toast';
 import {
   Package,
   Plus,
@@ -11,8 +12,15 @@ import {
   ArrowLeft,
   DollarSign,
   Image as ImageIcon,
-  Tag
+  Tag,
+  Minus,
+  AlertTriangle,
+  Settings,
+  RefreshCw,
+  BarChart3,
+  Bell
 } from 'lucide-react';
+import { productAPI } from '../../../utils/api';
 
 interface Product {
   _id: string;
@@ -22,6 +30,8 @@ interface Product {
   category: string;
   images: string[];
   inventory: number;
+  lowStockThreshold?: number;
+  enableLowStockAlerts?: boolean;
   unit?: string;
   isActive: boolean;
 }
@@ -50,6 +60,12 @@ export default function ProductsManagement() {
   });
   const [error, setError] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [updatingIds, setUpdatingIds] = useState<Record<string, boolean>>({});
+  const [editingThreshold, setEditingThreshold] = useState<string | null>(null);
+  const [thresholdValues, setThresholdValues] = useState<Record<string, number>>({});
+  const [showLowOnly, setShowLowOnly] = useState(false);
+  
+  const LOW_STOCK_THRESHOLD = 5;
 
   useEffect(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;

@@ -20,7 +20,8 @@ import {
   Star,
   Calendar,
   ArrowUpRight,
-  Store
+  Store,
+  BookOpen
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -386,7 +387,8 @@ export default function VendorDashboard() {
                 { icon: Store, label: 'My Marketplaces', route: '/vendor/marketplaces', color: 'purple' },
                 { icon: Plus, label: 'Add Product', route: '/vendor/products/add', color: 'purple' },
                 { icon: Package, label: 'Manage Inventory', route: '/vendor/inventory', color: 'purple' },
-                { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'purple' }
+                { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'purple' },
+                { icon: BookOpen, label: 'Help / Manual', route: '/vendor/help', color: 'purple' },
               ].map((action, index) => (
                 <motion.button
                   key={action.label}

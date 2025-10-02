@@ -58,6 +58,19 @@ export const productAPI = {
   create: (data: any) => apiClient.post('/products', data),
   update: (id: string, data: any) => apiClient.put(`/products/${id}`, data),
   delete: (id: string) => apiClient.delete(`/products/${id}`),
+  // Stock Management
+  adjustStock: (id: string, data: { newQuantity: number; reason: string; notes?: string }) => 
+    apiClient.put(`/products/${id}/stock`, data),
+  bulkUpdateStock: (data: { updates: any[] }) => 
+    apiClient.post('/products/stock/bulk-update', data),
+  getStockMovements: (params?: any) => 
+    apiClient.get('/products/stock/movements', { params }),
+  updateThreshold: (id: string, data: { threshold: number }) => 
+    apiClient.put(`/products/${id}/threshold`, data),
+  getLowStockProducts: () => 
+    apiClient.get('/products/stock/low'),
+  getStockAnalytics: () => 
+    apiClient.get('/products/stock/analytics'),
 };
 
 export const orderAPI = {
@@ -71,6 +84,14 @@ export const marketplaceAPI = {
   getAll: () => apiClient.get('/marketplaces'),
   getBySlug: (slug: string, include?: 'products') =>
     apiClient.get(`/marketplaces/${slug}`, { params: include ? { include } : undefined }),
+};
+
+export const notificationsAPI = {
+  getAll: (params?: any) => apiClient.get('/notifications', { params }),
+  getUnreadCount: () => apiClient.get('/notifications/count/unread'),
+  markAsRead: (id: string) => apiClient.put(`/notifications/${id}/read`),
+  markAllAsRead: () => apiClient.put('/notifications/read-all'),
+  delete: (id: string) => apiClient.delete(`/notifications/${id}`),
 };
 
 export default apiClient;
