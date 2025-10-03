@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import UserProfileDropdown from '../../components/UserProfileDropdown';
+import NotificationBell from '../../components/NotificationBell';
 import { 
   Package, 
   TrendingUp, 
@@ -20,7 +21,8 @@ import {
   Star,
   Calendar,
   ArrowUpRight,
-  Store
+  Store,
+  BookOpen
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -40,7 +42,6 @@ export default function VendorDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('week');
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   useEffect(() => {
     // Check authentication
@@ -246,24 +247,11 @@ export default function VendorDashboard() {
               </motion.button>
 
               {/* Notifications */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                className={`relative p-2 rounded-full backdrop-blur-xl border transition-all duration-300 ${
-                  isDarkMode 
-                    ? 'bg-purple-800/30 border-purple-700/50 text-purple-300' 
-                    : 'bg-purple-100/40 border-purple-200/50 text-purple-900'
-                }`}
-                aria-label="Notifications"
-              >
-                <Bell className="w-5 h-5" />
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"
-                />
-              </motion.button>
+              <NotificationBell className={`backdrop-blur-xl border ${
+                isDarkMode 
+                  ? 'bg-purple-800/30 border-purple-700/50' 
+                  : 'bg-purple-100/40 border-purple-200/50'
+              }`} />
 
               <UserProfileDropdown user={user} />
             </div>
@@ -384,9 +372,8 @@ export default function VendorDashboard() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { icon: Store, label: 'My Marketplaces', route: '/vendor/marketplaces', color: 'purple' },
-                { icon: Plus, label: 'Add Product', route: '/vendor/products/add', color: 'purple' },
-                { icon: Package, label: 'Manage Inventory', route: '/vendor/inventory', color: 'purple' },
-                { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'purple' }
+                { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'purple' },
+                { icon: BookOpen, label: 'Help / Manual', route: '/vendor/help', color: 'purple' },
               ].map((action, index) => (
                 <motion.button
                   key={action.label}

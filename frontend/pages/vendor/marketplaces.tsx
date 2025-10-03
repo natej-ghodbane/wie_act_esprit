@@ -11,7 +11,9 @@ import {
   X,
   Save,
   Image as ImageIcon,
-  ArrowLeft
+  ArrowLeft,
+  BookOpen,
+  Info
 } from 'lucide-react';
 
 interface Marketplace {
@@ -47,6 +49,7 @@ export default function MarketplacesManagement() {
   });
   const [error, setError] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(true);
 
   useEffect(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -201,7 +204,7 @@ export default function MarketplacesManagement() {
     }));
   };
 
-  const categoryOptions = ['Vegetables', 'Fruits', 'Grains', 'Herbs', 'Dairy', 'Organic'];
+  const categoryOptions = ['Fruits & Vegetables', 'Farming Tools', 'Meat & Livestock', 'Dairy Products'];
 
   if (isLoading) {
     return (
@@ -237,7 +240,7 @@ export default function MarketplacesManagement() {
         </motion.button>
 
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               My Marketplaces
@@ -255,6 +258,63 @@ export default function MarketplacesManagement() {
             <Plus className="w-5 h-5" />
             <span>Create Marketplace</span>
           </motion.button>
+        </div>
+
+        {/* Help / Manual for Marketplace Management */}
+        <div className={`mb-8 rounded-3xl border backdrop-blur-xl ${
+          isDarkMode ? 'bg-purple-900/30 border-purple-700/40' : 'bg-white/70 border-purple-200/60'
+        }`}>
+          <button
+            onClick={() => setIsHelpOpen(!isHelpOpen)}
+            className="w-full flex items-center justify-between px-5 py-4"
+            aria-expanded={isHelpOpen}
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-pink-600" />
+              <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Marketplace Manual</h2>
+            </div>
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{isHelpOpen ? 'Hide' : 'Show'}</span>
+          </button>
+          <AnimatePresence initial={false}>
+            {isHelpOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="px-5 pb-5"
+              >
+                <div className={`rounded-2xl p-4 ${isDarkMode ? 'bg-purple-900/40' : 'bg-purple-50/60'}`}>
+                  <div className="flex items-start gap-2 mb-3">
+                    <Info className="w-4 h-4 mt-1 text-pink-600" />
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      AGRI-HOPE uses a small, clear category set so buyers can find products easily and farmers can manage consistently.
+                      Assign one or more categories to each marketplace based on what you plan to sell.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="font-semibold mb-1">Categories</p>
+                      <ul className={`list-disc ml-5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                        <li>Fruits & Vegetables – All fresh produce</li>
+                        <li>Farming Tools – Tools and equipment for farming</li>
+                        <li>Meat & Livestock – Meat, sheep, cattle</li>
+                        <li>Dairy Products – Milk, cheese, yogurt, butter</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Management Tips</p>
+                      <ul className={`list-disc ml-5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                        <li>Create a marketplace per brand or location you manage.</li>
+                        <li>Use the categories above for consistent filtering across the app.</li>
+                        <li>You can edit marketplace info anytime; buyers will see updated details.</li>
+                        <li>You cannot delete a marketplace that still has products—move or delete products first.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Marketplaces Grid */}

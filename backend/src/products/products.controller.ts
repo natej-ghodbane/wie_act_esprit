@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards, Requ
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { StockAdjustmentDto, BulkStockUpdateDto, StockMovementQueryDto, LowStockThresholdDto } from './dto/stock-management.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('products')
@@ -54,6 +55,58 @@ export class ProductsController {
   @Delete(':id')
   async deleteProduct(@Param('id') id: string, @Request() req) {
     return this.productsService.delete(id, String(req.user._id));
+  }
+
+  // Stock Management Endpoints
+  
+  // Adjust stock for a specific product
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/stock')
+  async adjustStock(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() stockAdjustmentDto: StockAdjustmentDto
+  ) {
+    return this.productsService.adjustStock(id, String(req.user._id), stockAdjustmentDto);
+  }
+
+  // Bulk update stock for multiple products
+  @UseGuards(JwtAuthGuard)
+  @Post('stock/bulk-update')
+  async bulkUpdateStock(@Request() req, @Body() bulkStockUpdateDto: BulkStockUpdateDto) {
+    return this.productsService.bulkUpdateStock(String(req.user._id), bulkStockUpdateDto);
+  }
+
+  // Get stock movements history
+  @UseGuards(JwtAuthGuard)
+  @Get('stock/movements')
+  async getStockMovements(@Request() req, @Query() query: StockMovementQueryDto) {
+    return this.productsService.getStockMovements(String(req.user._id), query);
+  }
+
+  // Update low stock threshold for a product
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/threshold')
+  async updateLowStockThreshold(
+    @Param('id') id: string,
+    @Request() req,
+    @Body() thresholdDto: LowStockThresholdDto
+  ) {
+    return this.productsService.updateLowStockThreshold(id, String(req.user._id), thresholdDto);
+  }
+
+  // Get low stock products
+  @UseGuards(JwtAuthGuard)
+  @Get('stock/low')
+  async getLowStockProducts(@Request() req) {
+    return this.productsService.getLowStockProducts(String(req.user._id));
+  }
+
+  // Get stock analytics
+  @UseGuards(JwtAuthGuard)
+  @Get('stock/analytics')
+  async getStockAnalytics(@Request() req) {
+    return this.productsService.getStockAnalytics(String(req.user._id));
   }
 }
 
