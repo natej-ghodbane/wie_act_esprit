@@ -55,7 +55,7 @@ export default function SimpleInventoryManager({
           }
         });
       } else if (newQuantity <= threshold && previousQuantity > threshold) {
-        toast.warning(`⚠️ ${productTitle} is now LOW STOCK! Only ${newQuantity} left (threshold: ${threshold})`, {
+        toast(`⚠️ ${productTitle} is now LOW STOCK! Only ${newQuantity} left (threshold: ${threshold})`, {
           duration: 5000,
           style: {
             background: '#fef3c7',
@@ -155,6 +155,8 @@ export default function SimpleInventoryManager({
             onChange={(e) => setInventory(Number(e.target.value))}
             min="0"
             className="w-20 text-center border rounded px-2 py-1"
+            aria-label="Inventory quantity"
+            title="Enter inventory quantity"
           />
           
           <button
@@ -213,6 +215,8 @@ export default function SimpleInventoryManager({
             onChange={(e) => setThreshold(Number(e.target.value))}
             min="0"
             className="w-20 text-center border rounded px-2 py-1"
+            aria-label="Low stock threshold"
+            title="Enter low stock threshold"
           />
           <button
             onClick={() => updateThreshold(threshold)}
