@@ -15,12 +15,20 @@ export class MarketplacesController {
   // Get all marketplaces (public)
   @Get()
   async getMarketplaces(@Query('vendorId') vendorId?: string) {
-    if (vendorId) {
-      return this.marketplacesService.findByVendor(vendorId);
+    try {
+      console.log('Getting marketplaces, vendorId:', vendorId);
+      if (vendorId) {
+        const result = await this.marketplacesService.findByVendor(vendorId);
+        console.log('Found marketplaces for vendor:', result.length);
+        return result;
+      }
+      const marketplaces = await this.marketplacesService.findAll();
+      console.log('Found marketplaces:', marketplaces.length);
+      return marketplaces;
+    } catch (error) {
+      console.error('Error fetching marketplaces:', error);
+      return [];
     }
-    const marketplaces = await this.marketplacesService.findAll();
-    console.log('Found marketplaces:', marketplaces.length);
-    return marketplaces;
   }
 
   // Get marketplace by slug (public)
