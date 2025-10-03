@@ -1,15 +1,32 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import ProductCard, { ProductUI } from './ProductCard'
-import { mockProducts } from '@/components/marketplace/MarketplacePage'
+import apiClient from '@/utils/api';
 
 const categories = ["Fruits", "Vegetables", "Dairy & Eggs", "Pantry"] as const
 
 export default function CategorySections() {
+  const [products, setProducts] = useState<ProductUI[]>([]);
+  const [loading, setLoading] = useState(true);
   const byCategory: Record<string, ProductUI[]> = {}
   categories.forEach(cat => { byCategory[cat] = [] })
 
-  mockProducts.forEach(p => {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await apiClient.get('/products');
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  products.forEach(p => {
     const cat = p.category
     if (!byCategory[cat]) byCategory[cat] = []
     byCategory[cat].push({
@@ -21,7 +38,7 @@ export default function CategorySections() {
       description: p.description,
       rating: p.rating,
       reviews: p.reviews,
-      vendorName: p.farmer,
+      vendorName: p.vendorName,
     })
   })
 
@@ -36,7 +53,7 @@ export default function CategorySections() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {(byCategory[cat] || []).map((product, idx) => (
-              <div key={product.id} className="animate-fade-in-up" style={{ animationDelay: `${idx * 70}ms` }}>
+              <div key={product.id} className={`animate-fade-in-up delay-${idx}`}>
                 <ProductCard product={product} />
               </div>
             ))}

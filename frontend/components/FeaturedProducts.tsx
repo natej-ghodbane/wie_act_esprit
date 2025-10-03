@@ -1,11 +1,61 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ShoppingCart, Star } from 'lucide-react'
-import { mockProducts } from '@/components/marketplace/MarketplacePage'
+import { productAPI } from '@/utils/api'
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  rating?: number;
+  organic?: boolean;
+  unit?: string;
+  quantity?: number;
+  stockThreshold?: number;
+}
 
 const FeaturedProducts: React.FC = () => {
-  const featured = mockProducts.slice(0, 4)
+  const [featured, setFeatured] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const { data } = await productAPI.getAll({ featured: true, limit: 4 })
+        setFeatured(data)
+      } catch (error) {
+        console.error('Error fetching featured products:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchFeaturedProducts()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <section className="section-padding">
+        <div className="container-custom">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="card-glass animate-pulse">
+                <div className="rounded-xl bg-gray-200 dark:bg-gray-700 h-40"></div>
+                <div className="mt-4 space-y-3">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section aria-labelledby="featured-heading" className="section-padding">
@@ -54,8 +104,8 @@ const FeaturedProducts: React.FC = () => {
                 </div>
                 <Link
                   href="/checkout"
-                  className={`mt-4 inline-flex items-center gap-2 w-full justify-center btn btn-primary ${p.inStock ? '' : 'opacity-50 pointer-events-none'}`}
-                  aria-disabled={!p.inStock}
+                  className={`mt-4 inline-flex items-center gap-2 w-full justify-center btn btn-primary ${(p.quantity && p.quantity > 0) ? '' : 'opacity-50 pointer-events-none'}`}
+                  aria-disabled={!p.quantity || p.quantity <= 0}
                 >
                   <ShoppingCart className="w-4 h-4" /> Buy now
                 </Link>
