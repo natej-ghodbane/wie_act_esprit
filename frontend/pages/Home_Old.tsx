@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, memo, useRef } from "react"
 import { marked } from 'marked';
 import Link from "next/link"
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion"
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import { 
   ExternalLink, 
   Mail, 

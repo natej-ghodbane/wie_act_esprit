@@ -3,8 +3,15 @@ import { Toaster } from 'react-hot-toast';
 import SimpleInventoryManager from '../components/SimpleInventoryManager';
 import { productAPI } from '../utils/api';
 
+interface Product {
+  _id: string;
+  title: string;
+  inventory?: number;
+  lowStockThreshold?: number;
+}
+
 export default function TestInventoryPage() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 

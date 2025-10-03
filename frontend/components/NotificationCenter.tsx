@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, X, Check, AlertTriangle, CheckCircle, Info, AlertCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { toast } from 'react-hot-toast';
-import { notificationsAPI } from '../utils/api';
+import { notificationsAPI } from '@/utils/api';
 
 interface Notification {
   _id: string;

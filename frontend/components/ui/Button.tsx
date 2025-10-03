@@ -53,7 +53,9 @@ const buttonVariants = cva(
 )
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
+    'onDrag' | 'onDragEnd' | 'onDragStart' | 
+    'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
   loading?: boolean

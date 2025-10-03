@@ -46,7 +46,9 @@ const cardVariants = cva(
 )
 
 export interface CardProps
-  extends HTMLAttributes<HTMLDivElement>,
+  extends Omit<HTMLAttributes<HTMLDivElement>, 
+    'onDrag' | 'onDragEnd' | 'onDragStart' | 
+    'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'>,
     VariantProps<typeof cardVariants> {
   animateOnHover?: boolean
   children?: React.ReactNode

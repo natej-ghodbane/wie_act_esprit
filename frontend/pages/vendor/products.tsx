@@ -149,7 +149,7 @@ export default function VendorProductsPage() {
         });
       } else if (newValue <= threshold && newValue > 0 && previousQuantity > threshold) {
         console.log('⚠️ Showing LOW STOCK notification');
-        toast.warning(`⚠️ ${product.title} is LOW STOCK! Only ${newValue} left (threshold: ${threshold})`, {
+        toast(`⚠️ ${product.title} is LOW STOCK! Only ${newValue} left (threshold: ${threshold})`, {
           duration: 5000,
           style: {
             background: '#fef3c7',
@@ -303,7 +303,7 @@ export default function VendorProductsPage() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => {
-                toast.warning('⚠️ Test Low Stock Alert!', {
+                toast('⚠️ Test Low Stock Alert!', {
                   duration: 5000,
                   style: { background: '#fef3c7', color: '#d97706', fontWeight: 'bold' }
                 });

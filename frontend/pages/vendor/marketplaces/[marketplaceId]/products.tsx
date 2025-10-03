@@ -20,7 +20,7 @@ import {
   BarChart3,
   Bell
 } from 'lucide-react';
-import { productAPI } from '../../../utils/api';
+import { productAPI } from '../../../../utils/api';
 
 interface Product {
   _id: string;
