@@ -73,4 +73,13 @@ export const marketplaceAPI = {
     apiClient.get(`/marketplaces/${slug}`, { params: include ? { include } : undefined }),
 };
 
+export const paymentsAPI = {
+  createCheckout: (payload: {
+    items: { id: string; name: string; price: number; quantity: number }[];
+    successUrl?: string;
+    cancelUrl?: string;
+    customerEmail?: string;
+  }) => apiClient.post('/payments/checkout', payload),
+};
+
 export default apiClient;

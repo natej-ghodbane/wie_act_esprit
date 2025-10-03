@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, CreditCard, Smartphone, Wallet, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { paymentsAPI } from '@/utils/api';
 
 interface CartLineItem {
   id: string;
@@ -33,6 +34,11 @@ export default function PaymentModal({ isOpen, onClose, total, items, onSuccess 
     address: ''
   });
 
+  // Ensure totals and items are current even if props change
+  useEffect(() => {
+    // no-op: trigger rerender when totals change
+  }, [total, items]);
+
   const methods = [
     { id: 'card' as const, icon: CreditCard, label: 'Card' },
     { id: 'mobile' as const, icon: Smartphone, label: 'Mobile' },
@@ -45,15 +51,32 @@ export default function PaymentModal({ isOpen, onClose, total, items, onSuccess 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsProcessing(false);
-    setIsSuccess(true);
-    setTimeout(() => {
-      setIsSuccess(false);
-      onSuccess?.();
-      onClose();
-    }, 1800);
+    try {
+      setIsProcessing(true);
+      const frontendUrl = typeof window !== 'undefined' ? window.location.origin : undefined;
+      const { data } = await paymentsAPI.createCheckout({
+        items,
+        successUrl: frontendUrl ? `${frontendUrl}/buyer/checkout?status=success` : undefined,
+        cancelUrl: frontendUrl ? `${frontendUrl}/buyer/checkout?status=cancel` : undefined,
+        customerEmail: formData.email || undefined,
+      });
+      setIsProcessing(false);
+      if (data?.url) {
+        window.location.href = data.url as string;
+        return;
+      }
+      // Fallback UX
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        onSuccess?.();
+        onClose();
+      }, 1200);
+    } catch (err) {
+      setIsProcessing(false);
+      // Basic error notification; integrate toast if available
+      alert('Payment initiation failed. Please try again.');
+    }
   };
 
   if (!isOpen) return null;

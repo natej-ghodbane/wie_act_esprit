@@ -124,3 +124,6 @@ const seedProducts = async () => {
 };
 
 seedProducts();
+
+
+

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { addItem } from '@/utils/cart';
 
 export interface ProductUI {
   id: string;
@@ -29,10 +30,16 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
   const safePrice = Number.isFinite(Number(product?.price)) ? Number(product.price) : 0;
 
   const handleAddToCart = async () => {
-    if (!onAdd) return;
     setIsAdding(true);
-    await Promise.resolve(onAdd(product));
-    setIsAdding(false);
+    try {
+      if (onAdd) {
+        await Promise.resolve(onAdd(product));
+      } else {
+        addItem({ id: product.id, name: product.name, price: safePrice, quantity: 1 });
+      }
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -103,7 +110,7 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
           </span>
           <Button
             onClick={handleAddToCart}
-            disabled={isAdding || !onAdd}
+            disabled={isAdding}
             className={isAdding ? 'animate-pulse' : ''}
             size="sm"
             aria-label={`Add ${product.name} to cart`}
