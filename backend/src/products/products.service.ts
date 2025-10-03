@@ -2,13 +2,18 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery, Types } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
+import { StockMovement, StockMovementDocument } from './schemas/stock-movement.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { StockAdjustmentDto, BulkStockUpdateDto, StockMovementQueryDto, LowStockThresholdDto } from './dto/stock-management.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
+    @InjectModel(StockMovement.name) private readonly stockMovementModel: Model<StockMovementDocument>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   // Get all products with optional filters
@@ -102,5 +107,221 @@ export class ProductsService {
 
     await product.deleteOne();
     return { message: 'Product deleted successfully' };
+  }
+
+  // Stock Management Methods
+  async adjustStock(productId: string, userId: string, stockAdjustmentDto: StockAdjustmentDto) {
+    if (!Types.ObjectId.isValid(productId)) {
+      throw new BadRequestException('Invalid product ID');
+    }
+
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    // Check ownership
+    if (product.vendorId.toString() !== userId) {
+      throw new ForbiddenException('You do not have permission to update this product');
+    }
+
+    const previousQuantity = product.inventory;
+    const newQuantity = stockAdjustmentDto.newQuantity;
+    const change = newQuantity - previousQuantity;
+
+    // Update product inventory
+    product.inventory = newQuantity;
+    await product.save();
+
+    // Record stock movement
+    const stockMovement = new this.stockMovementModel({
+      productId: new Types.ObjectId(productId),
+      userId: new Types.ObjectId(userId),
+      previousQuantity,
+      newQuantity,
+      change,
+      reason: stockAdjustmentDto.reason,
+      notes: stockAdjustmentDto.notes,
+    });
+    await stockMovement.save();
+
+    // Handle notifications
+    await this.handleStockNotifications(userId, product, previousQuantity, newQuantity);
+
+    return {
+      product: await this.productModel.findById(productId).lean(),
+      stockMovement: stockMovement.toObject(),
+    };
+  }
+
+  async bulkUpdateStock(userId: string, bulkStockUpdateDto: BulkStockUpdateDto) {
+    const results = [];
+    const errors = [];
+
+    for (const update of bulkStockUpdateDto.updates) {
+      try {
+        const result = await this.adjustStock(update.productId, userId, {
+          newQuantity: update.newQuantity,
+          reason: update.reason,
+          notes: update.notes,
+        });
+        results.push(result);
+      } catch (error) {
+        errors.push({
+          productId: update.productId,
+          error: error.message,
+        });
+      }
+    }
+
+    return { results, errors };
+  }
+
+  async getStockMovements(userId: string, query: StockMovementQueryDto) {
+    const filter: any = { userId: new Types.ObjectId(userId) };
+    
+    if (query.productId) {
+      if (!Types.ObjectId.isValid(query.productId)) {
+        throw new BadRequestException('Invalid product ID');
+      }
+      filter.productId = new Types.ObjectId(query.productId);
+    }
+
+    if (query.reason) {
+      filter.reason = query.reason;
+    }
+
+    return this.stockMovementModel
+      .find(filter)
+      .populate('productId', 'title images')
+      .sort({ createdAt: -1 })
+      .limit(query.limit || 50)
+      .skip(query.offset || 0)
+      .lean();
+  }
+
+  async updateLowStockThreshold(productId: string, userId: string, thresholdDto: LowStockThresholdDto) {
+    if (!Types.ObjectId.isValid(productId)) {
+      throw new BadRequestException('Invalid product ID');
+    }
+
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    // Check ownership
+    if (product.vendorId.toString() !== userId) {
+      throw new ForbiddenException('You do not have permission to update this product');
+    }
+
+    product.lowStockThreshold = thresholdDto.threshold;
+    await product.save();
+
+    return product.toObject();
+  }
+
+  async getLowStockProducts(userId: string) {
+    const userObjectId = new Types.ObjectId(userId);
+    
+    return this.productModel
+      .find({
+        vendorId: userObjectId,
+        isActive: true,
+        enableLowStockAlerts: true,
+        $expr: { $lte: ['$inventory', '$lowStockThreshold'] }
+      })
+      .sort({ inventory: 1 })
+      .lean();
+  }
+
+  async getStockAnalytics(userId: string) {
+    const userObjectId = new Types.ObjectId(userId);
+    
+    const [totalProducts, lowStockProducts, outOfStockProducts, totalInventory] = await Promise.all([
+      this.productModel.countDocuments({ vendorId: userObjectId, isActive: true }),
+      this.productModel.countDocuments({
+        vendorId: userObjectId,
+        isActive: true,
+        enableLowStockAlerts: true,
+        $expr: { $lte: ['$inventory', '$lowStockThreshold'] }
+      }),
+      this.productModel.countDocuments({
+        vendorId: userObjectId,
+        isActive: true,
+        inventory: 0
+      }),
+      this.productModel.aggregate([
+        { $match: { vendorId: userObjectId, isActive: true } },
+        { $group: { _id: null, total: { $sum: '$inventory' } } }
+      ]).then(result => result[0]?.total || 0)
+    ]);
+
+    return {
+      totalProducts,
+      lowStockProducts,
+      outOfStockProducts,
+      totalInventory,
+      averageInventoryPerProduct: totalProducts > 0 ? Math.round(totalInventory / totalProducts) : 0
+    };
+  }
+
+  private async handleStockNotifications(userId: string, product: ProductDocument, previousQuantity: number, newQuantity: number) {
+    if (!product.enableLowStockAlerts) return;
+
+    const threshold = product.lowStockThreshold;
+    // "Critical" rule: always notify when quantity <= 3 (above 0)
+    const CRITICAL_LEVEL = 3;
+    const wasCriticalLow = previousQuantity <= CRITICAL_LEVEL && previousQuantity > 0;
+    const isNowCriticalLow = newQuantity <= CRITICAL_LEVEL && newQuantity > 0;
+
+    const wasLowStock = previousQuantity <= threshold && previousQuantity > 0;
+    const isNowLowStock = newQuantity <= threshold && newQuantity > 0;
+    const wasOutOfStock = previousQuantity === 0;
+    const isNowOutOfStock = newQuantity === 0;
+    const wasRestocked = previousQuantity < newQuantity && previousQuantity <= threshold;
+
+    try {
+      // Out of stock notification
+      if (!wasOutOfStock && isNowOutOfStock) {
+        await this.notificationsService.createOutOfStockAlert(
+          userId,
+          product._id.toString(),
+          product.title
+        );
+      }
+      // Low stock notification (only if not previously low stock)
+      else if (!wasLowStock && isNowLowStock && !isNowOutOfStock) {
+        await this.notificationsService.createLowStockAlert(
+          userId,
+          product._id.toString(),
+          product.title,
+          newQuantity,
+          threshold
+        );
+      }
+      // Critical low stock notification at <= 3 (only when crossing the boundary)
+      else if (!wasCriticalLow && isNowCriticalLow && !isNowOutOfStock) {
+        await this.notificationsService.createLowStockAlert(
+          userId,
+          product._id.toString(),
+          product.title,
+          newQuantity,
+          CRITICAL_LEVEL
+        );
+      }
+      // Restock notification
+      else if (wasRestocked && newQuantity > threshold) {
+        await this.notificationsService.createRestockAlert(
+          userId,
+          product._id.toString(),
+          product.title,
+          newQuantity
+        );
+      }
+    } catch (error) {
+      // Don't fail the stock update if notification fails
+      console.error('Failed to create stock notification:', error);
+    }
   }
 }

@@ -190,6 +190,11 @@ npm run start:prod
 4. Test thoroughly
 5. Submit a pull request
 
+## 📖 Management Manual
+
+For a step-by-step guide for farmers and admins on how to organize marketplaces and manage products (including recommended categories), see:
+- docs/management-manual.md
+
 ## 📝 License
 
 This project is licensed under [Your License] - see the LICENSE file for details.

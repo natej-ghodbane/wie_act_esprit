@@ -29,6 +29,14 @@ export class CreateProductDto {
   @IsOptional()
   inventory?: number;
 
+  @IsNumber()
+  @IsOptional()
+  lowStockThreshold?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  enableLowStockAlerts?: boolean;
+
   @IsString()
   @IsOptional()
   unit?: string;

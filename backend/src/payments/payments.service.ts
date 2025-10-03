@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
@@ -11,47 +11,51 @@ interface CreateCheckoutDto {
 
 @Injectable()
 export class PaymentsService {
-  private stripe: Stripe | null = null;
-  constructor(private readonly config: ConfigService) {}
+  private stripe: Stripe;
 
-  private getStripe(): Stripe {
-    if (this.stripe) return this.stripe;
+  constructor(private readonly config: ConfigService) {
     const apiKey = this.config.get<string>('STRIPE_SECRET_KEY');
     if (!apiKey) {
       throw new BadRequestException('Stripe is not configured. Missing STRIPE_SECRET_KEY');
     }
-    this.stripe = new Stripe(apiKey, { apiVersion: '2024-06-20' as any });
-    return this.stripe;
+
+    // Initialize Stripe once in the constructor
+    this.stripe = new Stripe(apiKey, {
+      apiVersion: '2025-09-30.clover',
+    });
   }
 
   async createCheckoutSession(payload: CreateCheckoutDto) {
-    const stripe = this.getStripe();
-
-    const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = payload.items.map((item) => ({
-      quantity: item.quantity,
-      price_data: {
-        currency: 'usd',
-        unit_amount: Math.round(item.price * 100),
-        product_data: {
-          name: item.name,
-          metadata: { productId: String(item.id) },
+    try {
+      const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = payload.items.map((item) => ({
+        quantity: item.quantity,
+        price_data: {
+          currency: 'usd',
+          unit_amount: Math.round(item.price * 100), // Stripe expects cents
+          product_data: {
+            name: item.name,
+            metadata: { productId: String(item.id) },
+          },
         },
-      },
-    }));
+      }));
 
-    const success_url = payload.successUrl || `${process.env.FRONTEND_URL || 'http://localhost:3000'}/buyer/checkout?status=success`;
-    const cancel_url = payload.cancelUrl || `${process.env.FRONTEND_URL || 'http://localhost:3000'}/buyer/checkout?status=cancel`;
+      const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+      const success_url = payload.successUrl || `${frontendUrl}/buyer/checkout?status=success`;
+      const cancel_url = payload.cancelUrl || `${frontendUrl}/buyer/checkout?status=cancel`;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items,
-      success_url,
-      cancel_url,
-      customer_email: payload.customerEmail,
-    });
+      const session = await this.stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'], // explicitly set
+        line_items,
+        success_url,
+        cancel_url,
+        customer_email: payload.customerEmail,
+      });
 
-    return session;
+      return session;
+    } catch (err) {
+      console.error('Stripe Checkout Session Error:', err);
+      throw new InternalServerErrorException('Failed to create checkout session');
+    }
   }
 }
-
-

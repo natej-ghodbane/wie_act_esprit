@@ -180,5 +180,12 @@ export default function PaymentModal({ isOpen, onClose, total, items, onSuccess 
         )}
       </div>
     </div>
-  );
-} 
+  )
+  }
+
+  // Remove the custom useEffect stub and import React's useEffect at the top
+  // (Already imported as part of 'useState' in your code, but should be imported explicitly if not)
+
+function useEffect(arg0: () => void, arg1: (number | CartLineItem[])[]) {
+  throw new Error('Function not implemented.');
+}

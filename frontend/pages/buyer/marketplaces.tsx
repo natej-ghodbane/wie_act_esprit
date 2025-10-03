@@ -37,6 +37,25 @@ export default function BuyerMarketplaces() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  // Canonical category set for marketplace tagging
+  const CANONICAL_CATEGORIES = [
+    'Fruits & Vegetables',
+    'Farming Tools',
+    'Meat & Livestock',
+    'Dairy Products',
+  ] as const;
+
+  // Map legacy categories into canonical buckets (best-effort)
+  const mapLegacyCategory = (c?: string): string | null => {
+    if (!c) return null;
+    const s = c.toLowerCase();
+    if (/(fruit|vegetable|veg)/.test(s)) return 'Fruits & Vegetables';
+    if (/(tool|equipment|tractor|hoe|rake)/.test(s)) return 'Farming Tools';
+    if (/(meat|beef|chicken|sheep|cow|livestock)/.test(s)) return 'Meat & Livestock';
+    if (/(dairy|milk|cheese|yogurt|butter|egg)/.test(s)) return 'Dairy Products';
+    return null;
+  };
+
   useEffect(() => {
     // Check authentication
     const token = localStorage.getItem('token');
@@ -53,6 +72,15 @@ export default function BuyerMarketplaces() {
       return;
     }
 
+    // Initialize from query params
+    try {
+      const url = new URL(window.location.href);
+      const q = url.searchParams.get('q');
+      const cat = url.searchParams.get('category');
+      if (q) setSearchQuery(q);
+      if (cat && ['All', ...CANONICAL_CATEGORIES].includes(cat)) setSelectedCategory(cat);
+    } catch {}
+
     fetchMarketplaces();
   }, []);
 
@@ -62,8 +90,18 @@ export default function BuyerMarketplaces() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched marketplaces:', data);
-        setMarketplaces(data.filter((m: Marketplace) => m.isActive));
+        // Normalize categories into canonical buckets for consistent filtering
+        const normalized: Marketplace[] = (Array.isArray(data) ? data : [])
+          .filter((m: Marketplace) => m.isActive)
+          .map((m: Marketplace) => ({
+            ...m,
+            categories: Array.from(new Set(
+              (Array.isArray(m.categories) ? m.categories : [])
+                .map(mapLegacyCategory)
+                .filter((x): x is string => Boolean(x))
+            )),
+          }));
+        setMarketplaces(normalized);
       }
     } catch (err) {
       console.error('Error fetching marketplaces:', err);
@@ -73,8 +111,11 @@ export default function BuyerMarketplaces() {
   };
 
   const filteredMarketplaces = marketplaces.filter(marketplace => {
-    const matchesSearch = marketplace.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      marketplace.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch = !q || marketplace.name.toLowerCase().includes(q) ||
+      (marketplace.description?.toLowerCase().includes(q) ?? false) ||
+      (marketplace.location?.city?.toLowerCase().includes(q) ?? false) ||
+      (marketplace.location?.country?.toLowerCase().includes(q) ?? false);
     
     const matchesCategory = selectedCategory === 'All' || 
       marketplace.categories.includes(selectedCategory);
@@ -82,7 +123,7 @@ export default function BuyerMarketplaces() {
     return matchesSearch && matchesCategory;
   });
 
-  const allCategories = ['All', ...Array.from(new Set(marketplaces.flatMap(m => m.categories)))];
+  const allCategories = ['All', ...CANONICAL_CATEGORIES];
 
   if (isLoading) {
     return (
@@ -138,7 +179,13 @@ export default function BuyerMarketplaces() {
               type="text"
               placeholder="Search marketplaces..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                const url = new URL(window.location.href);
+                const v = e.target.value.trim();
+                if (v) url.searchParams.set('q', v); else url.searchParams.delete('q');
+                window.history.replaceState({}, '', url.toString());
+              }}
               className={`w-full pl-12 pr-4 py-3 rounded-2xl transition-all duration-300 ${
                 isDarkMode
                   ? 'bg-white/10 text-white placeholder-gray-400 border border-white/20 focus:bg-white/20'
@@ -154,7 +201,13 @@ export default function BuyerMarketplaces() {
                 key={category}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  const url = new URL(window.location.href);
+                  if (category === 'All') url.searchParams.delete('category');
+                  else url.searchParams.set('category', category);
+                  window.history.replaceState({}, '', url.toString());
+                }}
                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
                   selectedCategory === category
                     ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
