@@ -64,6 +64,7 @@ export default function ProductsManagement() {
   const [editingThreshold, setEditingThreshold] = useState<string | null>(null);
   const [thresholdValues, setThresholdValues] = useState<Record<string, number>>({});
   const [showLowOnly, setShowLowOnly] = useState(false);
+  const [editingQuantity, setEditingQuantity] = useState<Record<string, number>>({});
   
   const LOW_STOCK_THRESHOLD = 5;
 
@@ -187,6 +188,55 @@ export default function ProductsManagement() {
       }
     } catch (err: any) {
       alert(err.message || 'An error occurred');
+    }
+  };
+
+  const beginEditQuantity = (product: Product) => {
+    setEditingQuantity((prev) => ({ ...prev, [product._id]: product.inventory }));
+  };
+
+  const setQuantityFor = (id: string, value: number) => {
+    if (Number.isNaN(value)) return;
+    if (value < 0) value = 0;
+    setEditingQuantity((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const adjustQuantity = async (product: Product) => {
+    const newQtyRaw = editingQuantity[product._id];
+    const newQuantity = typeof newQtyRaw === 'number' ? Math.max(0, Math.floor(newQtyRaw)) : product.inventory;
+    if (newQuantity === product.inventory) {
+      toast('Quantity unchanged');
+      return;
+    }
+    try {
+      setUpdatingIds((prev) => ({ ...prev, [product._id]: true }));
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/products/${product._id}/stock`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            newQuantity,
+            reason: 'manual_adjustment',
+            notes: 'Adjusted from marketplace dashboard',
+          }),
+        }
+      );
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || 'Failed to update stock');
+      }
+      const data = await response.json();
+      setProducts((prev) => prev.map((p) => (p._id === product._id ? { ...p, inventory: data.product?.inventory ?? newQuantity } : p)));
+      toast.success('Stock updated');
+    } catch (err: any) {
+      toast.error(err.message || 'Error updating stock');
+    } finally {
+      setUpdatingIds((prev) => ({ ...prev, [product._id]: false }));
     }
   };
 
@@ -360,6 +410,61 @@ export default function ProductsManagement() {
                   }`}>
                     {product.isActive ? 'Active' : 'Inactive'}
                   </div>
+                </div>
+
+                {/* Inline stock management */}
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between">
+                    <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'} text-sm`}>Inventory</div>
+                    <div className="flex items-center space-x-2">
+                      {editingQuantity[product._id] === undefined ? (
+                        <button
+                          onClick={() => beginEditQuantity(product)}
+                          className="px-3 py-1 rounded-md bg-purple-600 text-white text-sm hover:bg-purple-700"
+                        >
+                          Edit
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setQuantityFor(product._id, (editingQuantity[product._id] || 0) - 1)}
+                            className="p-2 rounded-md bg-gray-200 dark:bg-gray-800"
+                            disabled={!!updatingIds[product._id]}
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <input
+                            type="number"
+                            value={editingQuantity[product._id] ?? product.inventory}
+                            onChange={(e) => setQuantityFor(product._id, parseInt(e.target.value, 10))}
+                            className={`w-20 text-center px-3 py-2 rounded-md border ${
+                              isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'
+                            }`}
+                            min={0}
+                          />
+                          <button
+                            onClick={() => setQuantityFor(product._id, (editingQuantity[product._id] || 0) + 1)}
+                            className="p-2 rounded-md bg-gray-200 dark:bg-gray-800"
+                            disabled={!!updatingIds[product._id]}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => adjustQuantity(product)}
+                            className="px-3 py-1 rounded-md bg-green-600 text-white text-sm hover:bg-green-700 disabled:opacity-50"
+                            disabled={!!updatingIds[product._id]}
+                          >
+                            {updatingIds[product._id] ? 'Saving...' : 'Save'}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {editingQuantity[product._id] === undefined ? (
+                    <div className={`mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Current: {product.inventory} {product.unit || 'units'}
+                    </div>
+                  ) : null}
                 </div>
               </motion.div>
             ))}

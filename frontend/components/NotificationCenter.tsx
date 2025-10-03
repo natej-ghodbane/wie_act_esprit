@@ -104,22 +104,27 @@ export default function NotificationCenter({ onClose, isOpen }: NotificationCent
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-60">
+      {/* Subtle backdrop to keep dashboard visible */}
+      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
+
+      {/* Panel */}
+      <div className="absolute top-20 right-4 w-[92vw] sm:w-[28rem] md:w-[32rem] max-h-[75vh] overflow-hidden rounded-2xl backdrop-blur-xl border shadow-xl
+        bg-white/80 border-purple-200/50 dark:bg-purple-900/40 dark:border-purple-700/50">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-purple-200/50 dark:border-purple-700/50">
           <div className="flex items-center gap-3">
             <Bell className="w-6 h-6 text-pink-500" />
-            <h2 className="text-xl font-bold text-gray-900">Notifications</h2>
-            <span className="bg-pink-100 text-pink-800 text-sm px-2 py-1 rounded-full">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">Notifications</h2>
+            <span className="bg-pink-100 text-pink-800 dark:bg-pink-500/20 dark:text-pink-300 text-xs px-2 py-0.5 rounded-full">
               {notifications.filter(n => !n.isRead).length}
             </span>
           </div>
           <div className="flex items-center gap-2">
             {notifications.some(n => !n.isRead) && (
-              <Button size="sm" variant="outline" onClick={markAllAsRead}>
+              <Button size="sm" variant="outline" onClick={markAllAsRead} className="text-xs">
                 <Check className="w-4 h-4 mr-1" />
-                Mark All Read
+                Mark all read
               </Button>
             )}
             <Button size="sm" variant="outline" onClick={onClose}>
@@ -129,25 +134,27 @@ export default function NotificationCenter({ onClose, isOpen }: NotificationCent
         </div>
 
         {/* Content */}
-        <div className="max-h-96 overflow-y-auto">
+        <div className="max-h-[60vh] overflow-y-auto">
           {isLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading notifications...</p>
+              <p className="mt-2 text-gray-600 dark:text-purple-200">Loading notifications...</p>
             </div>
           ) : notifications.length === 0 ? (
             <div className="p-8 text-center">
-              <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No notifications yet</p>
+              <Bell className="w-12 h-12 text-gray-400 dark:text-purple-300 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-purple-200">No notifications yet</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-purple-200/60 dark:divide-purple-700/40">
               {notifications.map((notification) => (
                 <div
                   key={notification._id}
-                  className={`p-4 transition-colors ${
-                    !notification.isRead ? 'bg-blue-50/50' : 'bg-white'
-                  } hover:bg-gray-50`}
+                  className={`px-5 py-4 transition-colors ${
+                    !notification.isRead 
+                      ? 'bg-purple-50/60 dark:bg-purple-800/20' 
+                      : 'bg-transparent'
+                  } hover:bg-purple-50/80 dark:hover:bg-purple-800/30`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 mt-0.5">
@@ -158,19 +165,19 @@ export default function NotificationCenter({ onClose, isOpen }: NotificationCent
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
                           <h4 className={`text-sm font-medium ${
-                            !notification.isRead ? 'text-gray-900' : 'text-gray-700'
+                            !notification.isRead ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-purple-100'
                           }`}>
                             {notification.title}
                           </h4>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-gray-600 dark:text-purple-100 mt-1">
                             {notification.message}
                           </p>
                           {notification.productId && (
-                            <p className="text-xs text-pink-600 mt-1">
+                            <p className="text-xs text-pink-600 dark:text-pink-300 mt-1">
                               Product: {notification.productId.title}
                             </p>
                           )}
-                          <p className="text-xs text-gray-500 mt-2">
+                          <p className="text-xs text-gray-500 dark:text-purple-200 mt-2">
                             {new Date(notification.createdAt).toLocaleString()}
                           </p>
                         </div>
@@ -205,14 +212,16 @@ export default function NotificationCenter({ onClose, isOpen }: NotificationCent
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="w-full"
-          >
-            Close
-          </Button>
+        <div className="px-5 py-3 border-t border-purple-200/50 dark:border-purple-700/50 bg-white/60 dark:bg-purple-900/30">
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="text-sm"
+            >
+              Close
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -270,6 +270,11 @@ export class ProductsService {
     if (!product.enableLowStockAlerts) return;
 
     const threshold = product.lowStockThreshold;
+    // "Critical" rule: always notify when quantity <= 3 (above 0)
+    const CRITICAL_LEVEL = 3;
+    const wasCriticalLow = previousQuantity <= CRITICAL_LEVEL && previousQuantity > 0;
+    const isNowCriticalLow = newQuantity <= CRITICAL_LEVEL && newQuantity > 0;
+
     const wasLowStock = previousQuantity <= threshold && previousQuantity > 0;
     const isNowLowStock = newQuantity <= threshold && newQuantity > 0;
     const wasOutOfStock = previousQuantity === 0;
@@ -293,6 +298,16 @@ export class ProductsService {
           product.title,
           newQuantity,
           threshold
+        );
+      }
+      // Critical low stock notification at <= 3 (only when crossing the boundary)
+      else if (!wasCriticalLow && isNowCriticalLow && !isNowOutOfStock) {
+        await this.notificationsService.createLowStockAlert(
+          userId,
+          product._id.toString(),
+          product.title,
+          newQuantity,
+          CRITICAL_LEVEL
         );
       }
       // Restock notification

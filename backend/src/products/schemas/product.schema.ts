@@ -29,7 +29,7 @@ export class Product {
   @Prop({ default: 0 })
   inventory: number;
 
-  @Prop({ default: 5 })
+  @Prop({ default: 3 })
   lowStockThreshold: number;
 
   @Prop({ default: true })
