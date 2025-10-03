@@ -58,18 +58,19 @@ export const productAPI = {
   create: (data: any) => apiClient.post('/products', data),
   update: (id: string, data: any) => apiClient.put(`/products/${id}`, data),
   delete: (id: string) => apiClient.delete(`/products/${id}`),
+
   // Stock Management
-  adjustStock: (id: string, data: { newQuantity: number; reason: string; notes?: string }) => 
+  adjustStock: (id: string, data: { newQuantity: number; reason: string; notes?: string }) =>
     apiClient.put(`/products/${id}/stock`, data),
-  bulkUpdateStock: (data: { updates: any[] }) => 
+  bulkUpdateStock: (data: { updates: any[] }) =>
     apiClient.post('/products/stock/bulk-update', data),
-  getStockMovements: (params?: any) => 
+  getStockMovements: (params?: any) =>
     apiClient.get('/products/stock/movements', { params }),
-  updateThreshold: (id: string, data: { threshold: number }) => 
+  updateThreshold: (id: string, data: { threshold: number }) =>
     apiClient.put(`/products/${id}/threshold`, data),
-  getLowStockProducts: () => 
+  getLowStockProducts: () =>
     apiClient.get('/products/stock/low'),
-  getStockAnalytics: () => 
+  getStockAnalytics: () =>
     apiClient.get('/products/stock/analytics'),
 };
 
@@ -78,6 +79,7 @@ export const orderAPI = {
   getById: (id: string) => apiClient.get(`/orders/${id}`),
   create: (data: any) => apiClient.post('/orders', data),
   updateStatus: (id: string, status: string) => apiClient.put(`/orders/${id}/status`, { status }),
+  getAnalytics: () => apiClient.get('/orders/analytics'),
 };
 
 export const marketplaceAPI = {
@@ -86,12 +88,37 @@ export const marketplaceAPI = {
     apiClient.get(`/marketplaces/${slug}`, { params: include ? { include } : undefined }),
 };
 
+export const paymentsAPI = {
+  createCheckout: (payload: {
+    items: { id: string; name: string; price: number; quantity: number }[];
+    successUrl?: string;
+    cancelUrl?: string;
+    customerEmail?: string;
+  }) => apiClient.post('/payments/checkout', payload),
+};
+
 export const notificationsAPI = {
   getAll: (params?: any) => apiClient.get('/notifications', { params }),
   getUnreadCount: () => apiClient.get('/notifications/count/unread'),
   markAsRead: (id: string) => apiClient.put(`/notifications/${id}/read`),
   markAllAsRead: () => apiClient.put('/notifications/read-all'),
   delete: (id: string) => apiClient.delete(`/notifications/${id}`),
+};
+
+// Helper functions
+export const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(amount);
+};
+
+export const formatDate = (date: string) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(new Date(date));
 };
 
 export default apiClient;

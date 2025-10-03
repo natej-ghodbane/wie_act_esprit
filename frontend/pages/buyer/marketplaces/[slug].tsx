@@ -14,6 +14,8 @@ import {
   Grid3x3,
   List
 } from 'lucide-react';
+import { addItem, getCart } from '@/utils/cart';
+import { orderAPI } from '@/utils/api';
 
 interface Marketplace {
   _id: string;
@@ -61,6 +63,7 @@ export default function MarketplaceProducts() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [likedProducts, setLikedProducts] = useState<string[]>([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [justAddedId, setJustAddedId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check authentication
@@ -120,6 +123,28 @@ export default function MarketplaceProducts() {
   });
 
   const allCategories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
+
+  const handleAddToCart = async (p: Product) => {
+    if ((p as any).inventory === 0) return;
+    try {
+      // Persist order immediately with current user
+      await orderAPI.create({
+        items: [
+          { productId: p._id, quantity: 1, unitPrice: p.price }
+        ]
+      });
+      // Keep local cart UX in sync
+      addItem({ id: p._id, name: p.title, price: p.price, quantity: 1 });
+      const exists = getCart().some(i => i.id === p._id);
+      if (exists) {
+        setJustAddedId(p._id);
+        setTimeout(() => setJustAddedId(prev => (prev === p._id ? null : prev)), 1200);
+      }
+    } catch (e) {
+      console.error('Failed to create order', e);
+      alert('Failed to create order. Please ensure you are logged in.');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -396,12 +421,12 @@ export default function MarketplaceProducts() {
                     {/* Stock Badge */}
                     <div className="absolute bottom-3 left-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        product.inventory.available > 0
+                        (product as any).inventory > 0
                           ? 'bg-green-500 text-white'
                           : 'bg-red-500 text-white'
                       }`}>
-                        {product.inventory.available > 0 
-                          ? `${product.inventory.available} in stock`
+                        {(product as any).inventory > 0 
+                          ? `${(product as any).inventory} in stock`
                           : 'Out of stock'}
                       </span>
                     </div>
@@ -440,15 +465,18 @@ export default function MarketplaceProducts() {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        disabled={product.inventory.available === 0}
+                        disabled={(product as any).inventory === 0}
                         className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                          product.inventory.available === 0
+                          (product as any).inventory === 0
                             ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg'
+                            : justAddedId === product._id
+                              ? 'bg-green-600'
+                              : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg'
                         } text-white`}
+                        onClick={() => handleAddToCart(product)}
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        <span>Add to Cart</span>
+                        <span>{justAddedId === product._id ? 'Added' : 'Add to Cart'}</span>
                       </motion.button>
                     </div>
                   </div>

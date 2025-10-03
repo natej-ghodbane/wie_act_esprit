@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { cn } from '@/utils/cn'
 import Link from 'next/link'
+import PaymentModal from '@/components/marketplace/PaymentModal'
+import { useCart } from '@/components/CartProvider'
 
 interface NavigationProps {
   className?: string
@@ -29,7 +31,8 @@ export function Navigation({ className }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [cartCount] = useState(3) // This would come from your cart state
+  const { items, total, count, clearCart } = useCart()
+  const [isPaymentOpen, setPaymentOpen] = useState(false)
   
   // Handle scroll effect
   useEffect(() => {
@@ -168,19 +171,21 @@ export function Navigation({ className }: NavigationProps) {
               variant="ghost"
               size="icon"
               className="text-neutral-700 dark:text-neutral-300 relative"
+              onClick={() => setPaymentOpen(true)}
             >
               <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
+              {count > 0 && (
                 <motion.span
                   className="absolute -top-1 -right-1 w-5 h-5 bg-primary-500 text-white text-xs rounded-full flex items-center justify-center"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   whileHover={{ scale: 1.1 }}
                 >
-                  {cartCount}
+                  {count}
                 </motion.span>
               )}
             </Button>
+            <PaymentModal isOpen={isPaymentOpen} onClose={() => setPaymentOpen(false)} total={total} items={items} onSuccess={clearCart} />
 
             {/* Auth Buttons - Desktop */}
             <div className="hidden lg:flex items-center space-x-2">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import { AnimatePresence } from 'framer-motion';
 import '../styles/globals.css';
+import { CartProvider } from '@/components/CartProvider';
 import AnimatedBackground from '../components/Background';
 import Navbar from '../components/Navbar';
 import WelcomeScreen from './WelcomeScreen';
@@ -41,7 +42,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <>
+    <CartProvider>
+      <>
       <AnimatePresence mode="wait">
         {showWelcome && (
           <WelcomeScreen onLoadingComplete={handleWelcomeComplete} />
@@ -69,7 +71,8 @@ function MyApp({ Component, pageProps }: AppProps) {
           )}
         </>
       )}
-    </>
+      </>
+    </CartProvider>
   );
 }
 
