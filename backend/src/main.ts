@@ -28,7 +28,7 @@ async function createApp(): Promise<NestExpressApplication> {
       'http://localhost:3000',
       'http://localhost:3002',
       'https://chabiba-7hxd.vercel.app',
-    // New frontend URL
+      'https://wie-act-esprit.vercel.app', // Current frontend URL
       'https://wie-act-esprit-pr72.vercel.app', // Backend URL (for testing)
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
