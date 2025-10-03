@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Package, AlertTriangle, BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from './ui/Button';
 import { toast } from 'react-hot-toast';
-import { productAPI } from '../utils/api';
+import { productAPI } from '@/utils/api';
 
 interface StockAnalytics {
   totalProducts: number;

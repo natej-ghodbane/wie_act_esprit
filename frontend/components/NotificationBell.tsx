@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
-import { notificationsAPI } from '../utils/api';
+import { notificationsAPI } from '@/utils/api';
 
 interface NotificationBellProps {
   className?: string;

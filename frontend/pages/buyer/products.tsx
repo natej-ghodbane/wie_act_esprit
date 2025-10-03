@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import BuyerSidebar from '../../components/BuyerSidebar';
-import { productAPI } from '../../utils/api';
+import { productAPI } from '@/utils/api';
 
 interface Product {
   _id: string;
