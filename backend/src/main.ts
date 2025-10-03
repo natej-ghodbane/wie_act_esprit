@@ -28,6 +28,7 @@ async function createApp(): Promise<NestExpressApplication> {
       'http://localhost:3000',
       'http://localhost:3002',
       'https://chabiba-7hxd.vercel.app',
+      'https://*.vercel.app', // Allow all Vercel deployments
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,

@@ -12,17 +12,25 @@ export class ProductsController {
   // Get all products with optional filters (public)
   @Get()
   async getProducts(@Query() query: any) {
-    const filters: Record<string, unknown> = {};
-    if (query.category) {
-      filters.category = query.category;
+    try {
+      console.log('Getting products with query:', query);
+      const filters: Record<string, unknown> = {};
+      if (query.category) {
+        filters.category = query.category;
+      }
+      if (query.vendorId) {
+        filters.vendorId = query.vendorId;
+      }
+      if (query.marketplaceId) {
+        filters.marketplaceId = query.marketplaceId;
+      }
+      const products = await this.productsService.findAll(filters);
+      console.log('Found products:', products.length);
+      return products;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
     }
-    if (query.vendorId) {
-      filters.vendorId = query.vendorId;
-    }
-    if (query.marketplaceId) {
-      filters.marketplaceId = query.marketplaceId;
-    }
-    return this.productsService.findAll(filters);
   }
 
   // Get single product by ID (public)
