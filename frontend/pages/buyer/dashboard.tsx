@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import UserProfileDropdown from '../../components/UserProfileDropdown';
+import { userAPI, orderAPI, productAPI } from '@/utils/api';
 import { 
   ShoppingBag, 
   Heart, 
@@ -32,6 +33,33 @@ interface User {
   profileImage?: string;
 }
 
+interface Order {
+  id: string;
+  status: string;
+  total: number;
+  items: Array<{
+    productId: string;
+    quantity: number;
+    unitPrice: number;
+  }>;
+  createdAt: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image?: string;
+}
+
+interface OrderStats {
+  total: number;
+  pending: number;
+  completed: number; // includes paid or completed
+  paid: number; // strictly paid
+}
+
 export default function BuyerDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -39,16 +67,78 @@ export default function BuyerDashboard() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('week');
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  
+  // Dashboard data states
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
+  const [orderStats, setOrderStats] = useState<OrderStats>({
+    total: 0,
+    pending: 0,
+    completed: 0,
+    paid: 0,
+  });
+  const [analytics, setAnalytics] = useState<any>(null);
 
   useEffect(() => {
     // Check authentication
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('user');
 
     if (!token || !userData) {
       router.push('/auth/login');
       return;
     }
+
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch user profile
+        const { data: profileData } = await userAPI.getProfile();
+        setUser(profileData);
+
+        // Fetch recent orders
+        console.log('Fetching orders...');
+        const { data: ordersData } = await orderAPI.getAll();
+        console.log('Orders data received:', ordersData);
+        
+        const rawOrders = Array.isArray(ordersData) ? ordersData : [];
+        const orders: Order[] = rawOrders.map((o: any) => ({
+          id: o.id || o._id || '',
+          status: o.status || 'pending',
+          total: typeof o.totalAmount === 'number' ? o.totalAmount : (typeof o.total === 'number' ? o.total : 0),
+          items: Array.isArray(o.items) ? o.items : [],
+          createdAt: o.createdAt || new Date().toISOString(),
+        }));
+        setRecentOrders(orders.slice(0, 5)); // Get last 5 orders
+
+        // Calculate order statistics
+        const stats = orders.reduce((acc: OrderStats, order: Order) => {
+          acc.total++;
+          if (order.status === 'paid') acc.paid++;
+          if (order.status === 'paid' || order.status === 'completed') acc.completed++;
+          if (order.status === 'pending') acc.pending++;
+          return acc;
+        }, { total: 0, pending: 0, completed: 0, paid: 0 });
+        console.log('Calculated stats:', stats);
+        setOrderStats(stats);
+
+        // Fetch favorite/recommended products
+        const { data: productsData } = await productAPI.getAll();
+        setFavoriteProducts(productsData.slice(0, 4)); // Get 4 recommended products
+
+        // Fetch analytics
+        const { data: analyticsData } = await orderAPI.getAnalytics();
+        setAnalytics(analyticsData);
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
 
     try {
       const parsedUser = JSON.parse(userData);
@@ -69,6 +159,46 @@ export default function BuyerDashboard() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     router.push('/');
+  };
+
+  const refreshDashboard = async () => {
+    try {
+      setIsLoading(true);
+      console.log('Refreshing dashboard data...');
+      
+      // Fetch recent orders
+      const { data: ordersData } = await orderAPI.getAll();
+      console.log('Refreshed orders data:', ordersData);
+      
+      const rawOrders = Array.isArray(ordersData) ? ordersData : [];
+      const orders: Order[] = rawOrders.map((o: any) => ({
+        id: o.id || o._id || '',
+        status: o.status || 'pending',
+        total: typeof o.totalAmount === 'number' ? o.totalAmount : (typeof o.total === 'number' ? o.total : 0),
+        items: Array.isArray(o.items) ? o.items : [],
+        createdAt: o.createdAt || new Date().toISOString(),
+      }));
+      setRecentOrders(orders.slice(0, 5));
+
+      // Calculate order statistics
+      const stats = orders.reduce((acc: OrderStats, order: Order) => {
+        acc.total++;
+        if (order.status === 'paid') acc.paid++;
+        if (order.status === 'paid' || order.status === 'completed') acc.completed++;
+        if (order.status === 'pending') acc.pending++;
+        return acc;
+      }, { total: 0, pending: 0, completed: 0, paid: 0 });
+      setOrderStats(stats);
+
+      // Fetch analytics
+      const { data: analyticsData } = await orderAPI.getAnalytics();
+      setAnalytics(analyticsData);
+      
+    } catch (error) {
+      console.error('Error refreshing dashboard:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -128,6 +258,76 @@ export default function BuyerDashboard() {
       {!isDarkMode && (
         <div className="fixed inset-0 bg-gradient-to-br from-purple-200/20 via-pink-100/10 to-fuchsia-200/20 pointer-events-none z-0" />
       )}
+      
+      {/* Stats Section */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Total Orders Card */}
+          <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Orders</h3>
+              <Package className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+            </div>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{orderStats.total}</p>
+            <div className="flex items-center mt-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Completed: {orderStats.completed}</span>
+              <span className="mx-2 text-gray-400">•</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Pending: {orderStats.pending}</span>
+            </div>
+          </div>
+
+          {/* Recent Orders Section */}
+          <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg backdrop-blur-sm col-span-2">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
+              <button 
+                onClick={() => router.push('/buyer/orders')} 
+                className="text-sm text-purple-600 dark:text-purple-400 hover:underline"
+              >
+                View all orders
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {recentOrders.map((order, idx) => (
+                <div key={order.id || idx} className="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-gray-700/50 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <Package className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">Order #{(order.id || '').slice(-6) || '—'}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {(order.items?.length || 0)} items • ${Number(order.total || 0).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                    (order.status === 'completed' || order.status === 'paid')
+                      ? 'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30'
+                      : 'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30'
+                  }`}>
+                    {(order.status || 'pending').charAt(0).toUpperCase() + (order.status || 'pending').slice(1)}
+                  </span>
+                </div>
+              ))}
+
+              {recentOrders.length === 0 && (
+                <div className="text-center py-8">
+                  <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600 dark:text-gray-400">No orders yet</p>
+                  <button 
+                    onClick={() => router.push('/buyer/marketplace')} 
+                    className="mt-4 text-sm text-purple-600 dark:text-purple-400 hover:underline"
+                  >
+                    Browse products
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Advanced Navigation Bar with Glassmorphism */}
       <motion.nav 
@@ -244,6 +444,12 @@ export default function BuyerDashboard() {
                 >
                   Discover fresh, sustainable agricultural products from local farmers
                 </motion.p>
+                <motion.button
+                  onClick={refreshDashboard}
+                  className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Refresh Data
+                </motion.button>
               </div>
               
               {/* Timeframe Selector */}
@@ -281,10 +487,10 @@ export default function BuyerDashboard() {
           {/* Advanced Stats Cards with Neumorphism */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {[
-              { icon: ShoppingBag, label: 'Total Orders', value: '24', change: '+12%', color: 'emerald' },
-              { icon: Package, label: 'Active Orders', value: '3', change: '+5%', color: 'blue' },
-              { icon: Heart, label: 'Wishlist Items', value: '12', change: '+8%', color: 'rose' },
-              { icon: TrendingUp, label: 'Saved Amount', value: '$840', change: '+15%', color: 'amber' }
+              { icon: ShoppingBag, label: 'Total Orders', value: orderStats.total.toString(), change: '+12%', color: 'emerald' },
+              { icon: Package, label: 'Active Orders', value: orderStats.paid.toString(), change: '+5%', color: 'blue' },
+              { icon: Heart, label: 'Wishlist Items', value: '0', change: '+8%', color: 'rose' },
+              { icon: TrendingUp, label: 'Total Spent', value: analytics ? `$${analytics.totalSpent.toFixed(0)}` : '$0', change: '+15%', color: 'amber' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -355,8 +561,8 @@ export default function BuyerDashboard() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { icon: Store, label: 'Browse Marketplaces', route: '/buyer/marketplaces', color: 'emerald' },
-                { icon: ShoppingBag, label: 'My Cart', route: '/cart', color: 'blue' },
-                { icon: Package, label: 'Order History', route: '/orders', color: 'purple' },
+                { icon: ShoppingBag, label: 'My Cart', route: '/buyer/cart', color: 'blue' },
+                { icon: Package, label: 'Order History', route: '/buyer/orders', color: 'purple' },
                 { icon: Bookmark, label: 'Saved Items', route: '/saved', color: 'rose' }
               ].map((action, index) => (
                 <motion.button
@@ -410,13 +616,9 @@ export default function BuyerDashboard() {
               </div>
               
               <div className="space-y-4">
-                {[
-                  { action: 'Ordered Organic Tomatoes', time: '2 hours ago', status: 'completed' },
-                  { action: 'Added Fresh Herbs to wishlist', time: '5 hours ago', status: 'active' },
-                  { action: 'Reviewed Local Honey', time: '1 day ago', status: 'completed' }
-                ].map((activity, index) => (
+                {recentOrders.length > 0 ? recentOrders.slice(0, 3).map((order, index) => (
                   <motion.div 
-                    key={index}
+                    key={order.id}
                     initial={{ x: -10, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.9 + 0.1 * index }}
@@ -427,22 +629,35 @@ export default function BuyerDashboard() {
                     <motion.div 
                       whileHover={{ scale: 1.1 }}
                       className={`w-2 h-2 rounded-full ${
-                        activity.status === 'completed' 
-                          ? 'bg-purple-500' 
+                        order.status === 'paid' || order.status === 'completed' 
+                          ? 'bg-green-500' 
+                          : order.status === 'pending'
+                          ? 'bg-yellow-500'
                           : 'bg-amber-500'
                       }`}
                     />
                     <div className="flex-1">
                       <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                        {activity.action}
+                        Order #{order.id.slice(-6)} - ${order.total.toFixed(2)}
                       </p>
                       <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                        {activity.time}
+                        {new Date(order.createdAt).toLocaleDateString()} • {order.status}
                       </p>
                     </div>
                     <Star className={`w-4 h-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`} />
                   </motion.div>
-                ))}
+                )) : (
+                  <div className="text-center py-8">
+                    <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600 dark:text-gray-400">No recent activity</p>
+                    <button 
+                      onClick={() => router.push('/buyer/marketplaces')} 
+                      className="mt-4 text-sm text-purple-600 dark:text-purple-400 hover:underline"
+                    >
+                      Start shopping
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
 

@@ -15,6 +15,7 @@ import {
   List
 } from 'lucide-react';
 import { addItem, getCart } from '@/utils/cart';
+import { orderAPI } from '@/utils/api';
 
 interface Marketplace {
   _id: string;
@@ -123,15 +124,25 @@ export default function MarketplaceProducts() {
 
   const allCategories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
 
-  const handleAddToCart = (p: Product) => {
+  const handleAddToCart = async (p: Product) => {
     if ((p as any).inventory === 0) return;
-    addItem({ id: p._id, name: p.title, price: p.price, quantity: 1 });
-    const exists = getCart().some(i => i.id === p._id);
-    if (exists) {
-      setJustAddedId(p._id);
-      setTimeout(() => setJustAddedId(prev => (prev === p._id ? null : prev)), 1200);
-    } else {
-      alert('Could not add to cart. Please check browser storage settings.');
+    try {
+      // Persist order immediately with current user
+      await orderAPI.create({
+        items: [
+          { productId: p._id, quantity: 1, unitPrice: p.price }
+        ]
+      });
+      // Keep local cart UX in sync
+      addItem({ id: p._id, name: p.title, price: p.price, quantity: 1 });
+      const exists = getCart().some(i => i.id === p._id);
+      if (exists) {
+        setJustAddedId(p._id);
+        setTimeout(() => setJustAddedId(prev => (prev === p._id ? null : prev)), 1200);
+      }
+    } catch (e) {
+      console.error('Failed to create order', e);
+      alert('Failed to create order. Please ensure you are logged in.');
     }
   };
 

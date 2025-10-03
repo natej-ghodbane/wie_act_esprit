@@ -79,6 +79,7 @@ export const orderAPI = {
   getById: (id: string) => apiClient.get(`/orders/${id}`),
   create: (data: any) => apiClient.post('/orders', data),
   updateStatus: (id: string, status: string) => apiClient.put(`/orders/${id}/status`, { status }),
+  getAnalytics: () => apiClient.get('/orders/analytics'),
 };
 
 export const marketplaceAPI = {
@@ -102,6 +103,22 @@ export const notificationsAPI = {
   markAsRead: (id: string) => apiClient.put(`/notifications/${id}/read`),
   markAllAsRead: () => apiClient.put('/notifications/read-all'),
   delete: (id: string) => apiClient.delete(`/notifications/${id}`),
+};
+
+// Helper functions
+export const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(amount);
+};
+
+export const formatDate = (date: string) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(new Date(date));
 };
 
 export default apiClient;
