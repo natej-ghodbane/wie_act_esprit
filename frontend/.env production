@@ -1,4 +1,4 @@
 # Backend API URL - Updated to your actual deployment
 NEXT_PUBLIC_API_URL=https://wie-act-esprit-pr72.vercel.app/api
-NEXT_PUBLIC_APP_URL=https://chabiba-7hxd.vercel.app
+NEXT_PUBLIC_APP_URL=https://wie-act-esprit.vercel.app
 NEXT_PUBLIC_APP_NAME=AGRI-HOPE Marketplace
