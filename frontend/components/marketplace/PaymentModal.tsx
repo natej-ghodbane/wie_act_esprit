@@ -31,11 +31,15 @@ export default function PaymentModal({ isOpen, onClose, total, items, onSuccess 
     try {
       setIsProcessing(true);
       
+      // Get current user email
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
       // Create checkout session
       const response = await paymentsAPI.createCheckout({
         items,
         successUrl: `${window.location.origin}/buyer/orders?status=success`,
-        cancelUrl: `${window.location.origin}/buyer/marketplace?status=cancel`
+        cancelUrl: `${window.location.origin}/buyer/marketplace?status=cancel`,
+        customerEmail: user.email
       });
 
       // Get Stripe instance

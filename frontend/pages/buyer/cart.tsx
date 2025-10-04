@@ -50,12 +50,16 @@ export default function BuyerCartPage() {
       const orderResponse = await orderAPI.create(orderPayload);
       console.log('Order created:', orderResponse.data);
       
+      // Get current user email
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
       // Then create Stripe checkout session
       const payload = {
         items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
         successUrl: `${window.location.origin}/buyer/dashboard?payment=success`,
         cancelUrl: `${window.location.origin}/buyer/cart?status=cancel`,
         orderId: orderResponse.data._id || orderResponse.data.id, // Pass the order ID
+        customerEmail: user.email, // Pass customer email for webhook processing
       };
       
       const { data } = await paymentsAPI.createCheckout(payload);

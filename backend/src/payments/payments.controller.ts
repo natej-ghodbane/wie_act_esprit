@@ -9,6 +9,7 @@ interface CreateCheckoutDto {
   successUrl?: string;
   cancelUrl?: string;
   customerEmail?: string;
+  orderId?: string;
 }
 
 @Controller('payments')
@@ -24,6 +25,18 @@ export class PaymentsController {
       throw new HttpException('No items to checkout', HttpStatus.BAD_REQUEST);
     }
     const session = await this.paymentsService.createCheckoutSession(body);
+    
+    // Store session ID in order if orderId is provided
+    if (body.orderId && session.id) {
+      try {
+        await this.ordersService.updateSessionId(body.orderId, session.id);
+        console.log('Session ID stored in order:', body.orderId, session.id);
+      } catch (error) {
+        console.error('Failed to store session ID in order:', error);
+        // Don't fail the checkout if this fails
+      }
+    }
+    
     return { id: session.id, url: session.url };
   }
 
@@ -35,6 +48,45 @@ export class PaymentsController {
     } catch (error) {
       console.error('Test webhook error:', error);
       throw new HttpException('Failed to update order status', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('test-payment-success')
+  async testPaymentSuccess(@Body() body: { sessionId: string; customerEmail?: string }) {
+    try {
+      console.log('Testing payment success for session:', body.sessionId);
+      
+      // Simulate a successful payment by updating orders
+      let orderUpdated = false;
+      
+      // Try to find order by session ID
+      const orderBySession = await this.ordersService.updateStatusBySessionId(body.sessionId, 'paid');
+      if (orderBySession) {
+        console.log('Order updated by session ID:', orderBySession._id);
+        orderUpdated = true;
+      }
+      
+      // If no order found by session ID and customer email provided, try fallback
+      if (!orderUpdated && body.customerEmail) {
+        const orders = await this.ordersService.findAllByCustomerEmail(body.customerEmail);
+        const pendingOrders = orders.filter(order => order.status === 'pending');
+        
+        if (pendingOrders.length > 0) {
+          const mostRecentPending = pendingOrders[0];
+          await this.ordersService.updateStatus(String(mostRecentPending._id), 'paid');
+          console.log('Order updated by fallback method:', mostRecentPending._id);
+          orderUpdated = true;
+        }
+      }
+      
+      return { 
+        success: true, 
+        orderUpdated,
+        message: orderUpdated ? 'Order status updated to paid' : 'No pending orders found to update'
+      };
+    } catch (error) {
+      console.error('Test payment success error:', error);
+      throw new HttpException('Failed to test payment success', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -66,7 +118,7 @@ export class PaymentsController {
     console.log('=== WEBHOOK RECEIVED ===');
     console.log('Headers:', req.headers);
     console.log('Body type:', typeof req.body);
-    console.log('Body keys:', Object.keys(req.body || {}));
+    console.log('Body length:', req.body?.length || 0);
     
     const sig = req.headers['stripe-signature'] as string;
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -76,6 +128,11 @@ export class PaymentsController {
       return res.status(400).send('Webhook secret not configured');
     }
 
+    if (!sig) {
+      console.error('Missing stripe-signature header');
+      return res.status(400).send('Missing stripe-signature header');
+    }
+
     let event: Stripe.Event;
 
     try {
@@ -83,7 +140,10 @@ export class PaymentsController {
         apiVersion: '2025-09-30.clover',
       });
       
-      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      // req.body should be a Buffer when using express.raw()
+      const body = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body));
+      event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
+      console.log('Webhook event verified successfully:', event.type);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return res.status(400).send('Webhook signature verification failed');
@@ -95,6 +155,8 @@ export class PaymentsController {
       console.log('Payment succeeded for session:', session.id);
       console.log('Session customer email:', session.customer_email);
       console.log('Session metadata:', session.metadata);
+      console.log('Session payment status:', session.payment_status);
+      console.log('Session amount total:', session.amount_total);
       
       try {
         let orderUpdated = false;
@@ -106,6 +168,8 @@ export class PaymentsController {
           if (order) {
             console.log('Order status updated to paid by metadata orderId:', order._id);
             orderUpdated = true;
+          } else {
+            console.log('No order found with metadata orderId:', session.metadata.orderId);
           }
         }
         
@@ -117,15 +181,17 @@ export class PaymentsController {
           if (orderBySession) {
             console.log('Order status updated to paid by session ID:', orderBySession._id);
             orderUpdated = true;
+          } else {
+            console.log('No order found with session ID:', session.id);
           }
         }
         
         // Fallback: find the most recent pending order for this customer
-        if (!orderUpdated) {
+        if (!orderUpdated && session.customer_email) {
           console.log('No order found by session ID or metadata, trying fallback method');
           
           // Get all orders for this customer
-          const orders = await this.ordersService.findAllByBuyer(session.customer_email || '');
+          const orders = await this.ordersService.findAllByCustomerEmail(session.customer_email);
           console.log('Found orders for customer:', orders.length);
           
           // Find the most recent pending order
@@ -145,12 +211,24 @@ export class PaymentsController {
         
         if (!orderUpdated) {
           console.error('Failed to update any order for session:', session.id);
+          console.error('Session details:', {
+            id: session.id,
+            customer_email: session.customer_email,
+            metadata: session.metadata,
+            payment_status: session.payment_status
+          });
+        } else {
+          console.log('Successfully updated order status to paid for session:', session.id);
         }
       } catch (error) {
         console.error('Error updating order status:', error);
+        console.error('Error stack:', error.stack);
+        // Don't fail the webhook for order update errors
       }
+    } else {
+      console.log('Unhandled event type:', event.type);
     }
 
-    res.json({ received: true });
+    res.status(200).json({ received: true });
   }
 }

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as express from 'express';
 
 let appInstance: NestExpressApplication | null = null;
 
@@ -15,6 +16,9 @@ async function createApp(): Promise<NestExpressApplication> {
     abortOnError: false,
   });
 
+  // Configure raw body parsing for Stripe webhooks
+  app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
