@@ -2,16 +2,22 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { BookOpen, GraduationCap, Leaf, LogOut } from "lucide-react";
 
 export default function DashboardPage() {
   const [active, setActive] = useState("overview");
+  const router = useRouter();
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+  };
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-pink-100 to-purple-200">
       {/* Sidebar */}
       <div className="w-64 bg-white/40 backdrop-blur-lg shadow-xl p-6 flex flex-col">
-        <h1 className="text-2xl font-bold text-pink-700 mb-8">🌱 AGRI-HOPE</h1>
+        <h1 className="text-2xl font-bold text-pink-700 mb-8">🌱 KOFTI</h1>
         <nav className="flex flex-col gap-4">
           <button
             onClick={() => setActive("overview")}
@@ -69,7 +75,10 @@ export default function DashboardPage() {
             <p className="text-gray-600 text-sm">
               Learn eco-friendly farming techniques and improve productivity.
             </p>
-            <button className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow-md hover:opacity-90">
+            <button 
+              onClick={() => handleNavigation('/articles/liste')}
+              className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition-opacity"
+            >
               Explore →
             </button>
           </div>
@@ -81,7 +90,10 @@ export default function DashboardPage() {
             <p className="text-gray-600 text-sm">
               Access articles, videos, and interactive learning modules.
             </p>
-            <button className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow-md hover:opacity-90">
+            <button 
+              onClick={() => handleNavigation('/articles externes')}
+              className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition-opacity"
+            >
               Access →
             </button>
           </div>
