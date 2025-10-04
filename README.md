@@ -2,6 +2,8 @@
 
 A comprehensive marketplace platform connecting farmers, vendors, and buyers through modern web technologies. Built with Next.js frontend and Nest.js backend for agricultural commerce and education.
 
+🌐 **Live Demo**: [https://wie-act-esprit.vercel.app](https://wie-act-esprit.vercel.app)
+
 ## 🚀 Tech Stack
 
 ### Frontend
@@ -13,9 +15,10 @@ A comprehensive marketplace platform connecting farmers, vendors, and buyers thr
 
 ### Backend
 - **Nest.js + TypeScript** - Scalable Node.js framework
-- **MongoDB + Mongoose** - NoSQL database with ODM
+- **MongoDB Atlas + Mongoose** - Cloud NoSQL database with ODM
 - **JWT + Passport** - Authentication and authorization
 - **Axios-compatible APIs** - RESTful API design
+- **Vercel** - Serverless deployment platform
 
 ## 📌 Features
 
@@ -33,32 +36,35 @@ A comprehensive marketplace platform connecting farmers, vendors, and buyers thr
 
 ### Platform Features
 - **User Authentication**: Secure login/register for all user types
-- **Admin Dashboard**: Platform management and oversight
 - **AI Assistant**: Intelligent farming and marketplace guidance
 - **Educational Resources**: Farming knowledge and best practices
+- **Articles & Learning**: Internal and external agricultural resources
 
 ## 📂 Project Structure
 
 ```
-marketplace-platform/
-├── frontend/                    # Next.js Application
+wie_act_esprit/
+├── frontend/                    # Next.js Application (Deployed on Vercel)
 │   ├── pages/                  # Next.js routing
 │   │   ├── auth/              # Authentication pages
 │   │   ├── vendor/            # Vendor dashboard
 │   │   ├── buyer/             # Buyer interface
-│   │   └── admin/             # Admin panel
+│   │   ├── articles/          # Educational articles and resources
+│   │   └── api/               # API routes
 │   ├── components/            # Reusable UI components
 │   ├── styles/                # TailwindCSS styles
 │   ├── utils/                 # Axios helpers and utilities
 │   └── public/                # Static assets
-├── backend/                    # Nest.js API Server
+├── backend/                    # Nest.js API Server (Deployed on Vercel)
 │   └── src/
 │       ├── auth/              # Authentication module
-│       ├── users/             # User management (Buyer, Vendor, Admin)
+│       ├── users/             # User management (Buyer, Vendor)
 │       ├── products/          # Product/service CRUD APIs
 │       ├── orders/            # Transaction and order management
+│       ├── marketplaces/      # Marketplace management
+│       ├── notifications/     # Notification system
+│       ├── payments/          # Payment processing
 │       └── common/            # Shared DTOs, pipes, filters
-├── docs/                      # Documentation
 └── README.md                  # Project documentation
 ```
 
@@ -66,15 +72,15 @@ marketplace-platform/
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- MongoDB (local or Atlas)
+- MongoDB Atlas account
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
-cd marketplace-platform
+git clone https://github.com/natej-ghodbane/wie_act_esprit
+cd wie_act_esprit
 ```
 
 2. **Install Frontend Dependencies**
@@ -99,7 +105,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 **Backend (.env):**
 ```env
-MONGODB_URI=mongodb://localhost:27017/agrihope
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/agrihope
 JWT_SECRET=yourSecretKey
 PORT=3001
 NODE_ENV=development
@@ -137,14 +143,14 @@ npm run start:prod
 
 ## 🌍 Deployment
 
-### Recommended Platforms
-- **Frontend**: Vercel (automatic deployment from Git)
-- **Backend**: Render, Railway, or Vercel serverless functions
-- **Database**: MongoDB Atlas
+### Current Deployment
+- **Frontend**: [Vercel](https://wie-act-esprit.vercel.app) - Automatic deployment from Git
+- **Backend**: Vercel Serverless Functions - API endpoints
+- **Database**: MongoDB Atlas - Cloud database
 
 ### Deployment Steps
 1. Push to main branch for auto-deployment
-2. Configure environment variables on hosting platform
+2. Configure environment variables on Vercel
 3. Set up MongoDB Atlas connection string
 4. Configure CORS settings for production domains
 
@@ -164,23 +170,18 @@ npm run start:prod
 
 ## 🎯 User Roles
 
-### Admin
-- Platform oversight and management
-- User management and moderation
-- Analytics and reporting
-- System configuration
-
 ### Vendor/Farmer
 - Product/service listing management
 - Order processing and fulfillment
 - Sales analytics and reporting
 - Profile and business information
+- Access to educational resources and articles
 
 ### Buyer
 - Product browsing and purchasing
 - Order tracking and history
 - Profile management
-- Access to educational content
+- Access to educational content and learning materials
 
 ## 🤝 Contributing
 
@@ -190,14 +191,9 @@ npm run start:prod
 4. Test thoroughly
 5. Submit a pull request
 
-## 📖 Management Manual
-
-For a step-by-step guide for farmers and admins on how to organize marketplaces and manage products (including recommended categories), see:
-- docs/management-manual.md
-
 ## 📝 License
 
-This project is licensed under [Your License] - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👥 Contributors
 
