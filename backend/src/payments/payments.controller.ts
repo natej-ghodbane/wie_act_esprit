@@ -125,7 +125,7 @@ export class PaymentsController {
           console.log('No order found by session ID or metadata, trying fallback method');
           
           // Get all orders for this customer
-          const orders = await this.ordersService.findAllByBuyer(session.customer_email || '');
+          const orders = await this.ordersService.findAllByCustomerEmail(session.customer_email || '');
           console.log('Found orders for customer:', orders.length);
           
           // Find the most recent pending order
@@ -148,9 +148,12 @@ export class PaymentsController {
         }
       } catch (error) {
         console.error('Error updating order status:', error);
+        // Don't fail the webhook for order update errors
       }
+    } else {
+      console.log('Unhandled event type:', event.type);
     }
 
-    res.json({ received: true });
+    res.status(200).json({ received: true });
   }
 }

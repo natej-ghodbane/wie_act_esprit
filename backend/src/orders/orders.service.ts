@@ -2,6 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Order, OrderDocument } from './schemas/order.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 
 interface CreateOrderItemDto {
   productId: string;
@@ -15,7 +16,10 @@ interface CreateOrderDto {
 
 @Injectable()
 export class OrdersService {
-  constructor(@InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>) {}
+  constructor(
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+  ) {}
 
   async create(buyerId: string, dto: CreateOrderDto) {
     if (!dto.items || dto.items.length === 0) {
@@ -39,6 +43,17 @@ export class OrdersService {
   async findAllByBuyer(buyerId: string) {
     return this.orderModel
       .find({ buyerId: new Types.ObjectId(buyerId) })
+      .sort({ createdAt: -1 })
+      .lean();
+  }
+
+  async findAllByCustomerEmail(customerEmail: string) {
+    // First find the user by email, then find their orders
+    const user = await this.userModel.findOne({ email: customerEmail }).exec();
+    if (!user) return [];
+    
+    return this.orderModel
+      .find({ buyerId: user._id })
       .sort({ createdAt: -1 })
       .lean();
   }
