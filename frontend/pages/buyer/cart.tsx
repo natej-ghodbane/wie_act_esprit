@@ -55,6 +55,7 @@ export default function BuyerCartPage() {
         items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
         successUrl: `${window.location.origin}/buyer/dashboard?payment=success`,
         cancelUrl: `${window.location.origin}/buyer/cart?status=cancel`,
+        orderId: orderResponse.data._id || orderResponse.data.id, // Pass the order ID
       };
       
       const { data } = await paymentsAPI.createCheckout(payload);
