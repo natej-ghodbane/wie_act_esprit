@@ -30,7 +30,7 @@ export default function DashboardPage() {
             <BookOpen size={20} /> Overview
           </button>
           <button
-            onClick={() => setActive("courses")}
+            onClick={() => handleNavigation('/articles externes')}
             className={`flex items-center gap-3 px-4 py-2 rounded-xl ${
               active === "courses"
                 ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
@@ -40,7 +40,7 @@ export default function DashboardPage() {
             <GraduationCap size={20} /> Courses
           </button>
           <button
-            onClick={() => setActive("sustainability")}
+            onClick={() => handleNavigation('/articles/liste')}
             className={`flex items-center gap-3 px-4 py-2 rounded-xl ${
               active === "sustainability"
                 ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
