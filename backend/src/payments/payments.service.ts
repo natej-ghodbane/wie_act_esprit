@@ -27,6 +27,8 @@ export class PaymentsService {
 
   async createCheckoutSession(payload: CreateCheckoutDto) {
     try {
+      console.log('Creating checkout session with payload:', JSON.stringify(payload, null, 2));
+      
       const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = payload.items.map((item) => ({
         quantity: item.quantity,
         price_data: {
@@ -39,9 +41,13 @@ export class PaymentsService {
         },
       }));
 
-      const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+      const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'https://wie-act-esprit.vercel.app';
       const success_url = payload.successUrl || `${frontendUrl}/buyer/checkout?status=success`;
       const cancel_url = payload.cancelUrl || `${frontendUrl}/buyer/checkout?status=cancel`;
+
+      console.log('Frontend URL:', frontendUrl);
+      console.log('Success URL:', success_url);
+      console.log('Cancel URL:', cancel_url);
 
       const session = await this.stripe.checkout.sessions.create({
         mode: 'payment',
@@ -52,9 +58,11 @@ export class PaymentsService {
         customer_email: payload.customerEmail,
       });
 
+      console.log('Checkout session created successfully:', session.id);
       return session;
     } catch (err) {
       console.error('Stripe Checkout Session Error:', err);
+      console.error('Error details:', JSON.stringify(err, null, 2));
       throw new InternalServerErrorException('Failed to create checkout session');
     }
   }
