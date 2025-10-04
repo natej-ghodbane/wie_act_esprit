@@ -99,7 +99,7 @@ export default function TestOrdersPage() {
   return (
     <>
       <Head>
-        <title>Test Orders | AGRI-HOPE</title>
+        <title>Test Orders | KOFTI</title>
       </Head>
 
       <main className="min-h-screen bg-white dark:bg-gray-900 p-8">

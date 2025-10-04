@@ -198,7 +198,7 @@ export default function VendorDashboard() {
               >
                 <Leaf className="text-white w-5 h-5" />
               </motion.div>
-              <span className="hidden sm:block">AGRI-HOPE</span>
+              <span className="hidden sm:block">KOFTI</span>
             </motion.div>
 
             {/* Right Navigation */}

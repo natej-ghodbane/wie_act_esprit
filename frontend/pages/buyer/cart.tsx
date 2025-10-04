@@ -80,7 +80,7 @@ export default function BuyerCartPage() {
   return (
     <>
       <Head>
-        <title>Your Cart | AGRI-HOPE</title>
+        <title>Your Cart | KOFTI</title>
         <meta name="description" content="Review and manage your cart items" />
       </Head>
 

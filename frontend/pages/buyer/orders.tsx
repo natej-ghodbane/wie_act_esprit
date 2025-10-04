@@ -135,7 +135,7 @@ export default function BuyerOrdersPage() {
   return (
     <>
       <Head>
-        <title>Order History | AGRI-HOPE</title>
+        <title>Order History | KOFTI</title>
         <meta name="description" content="View your order history and track your purchases" />
       </Head>
 

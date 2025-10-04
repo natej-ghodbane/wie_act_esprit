@@ -193,7 +193,7 @@ const MainTitle = memo(() => (
           }}
         />
         <span className="relative bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-800 dark:from-white dark:via-emerald-100 dark:to-teal-100 bg-clip-text text-transparent">
-          AGRI-HOPE
+          KOFTI
         </span>
       </span>
       <br />
@@ -384,7 +384,7 @@ const Home = () => {
           <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Why Choose 
-              <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent"> AGRI-HOPE</span>
+              <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent"> KOFTI</span>
               ?
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">

@@ -1,4 +1,4 @@
-# AGRI-HOPE Management Manual
+# KOFTI Management Manual
 
 Audience: Farmers (Vendors), Admins
 

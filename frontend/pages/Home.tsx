@@ -191,7 +191,7 @@ const MainTitle = memo(() => (
           }}
         />
         <span className="relative bg-gradient-to-r from-gray-900 via-purple-800 to-pink-800 dark:from-white dark:via-purple-100 dark:to-pink-100 bg-clip-text text-transparent">
-          AGRI-HOPE
+          KOFTI
         </span>
       </span>
       <br />
@@ -487,7 +487,7 @@ const Home = () => {
             >
               Why Choose{" "}
               <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 dark:from-purple-400 dark:via-pink-400 dark:to-fuchsia-400 bg-clip-text text-transparent">
-                AGRI-HOPE
+                KOFTI
               </span>
               ?
             </motion.h2>

@@ -6,7 +6,7 @@ const Marketplace: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Marketplace | AGRI-HOPE</title>
+        <title>Marketplace | KOFTI</title>
         <meta name="description" content="Browse fresh, local farm products." />
       </Head>
       <main>

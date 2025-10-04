@@ -1,4 +1,4 @@
-// Component prop types for AGRI-HOPE Marketplace
+// Component prop types for KOFTI Marketplace
 
 import { LucideIcon } from 'lucide-react';
 

@@ -62,7 +62,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <span className="block text-sm pb-4 text-neutral-glow text-center font-rajdhani">
                   © 2025{" "}
                   <a href="" className="hover:underline neon-text-pink">
-                    Agrihope
+                    KOFTI
                   </a>
                   . All Rights Reserved.
                 </span>

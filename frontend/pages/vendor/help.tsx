@@ -61,7 +61,7 @@ export default function VendorHelpPage() {
           <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-full border backdrop-blur-xl ${
             isDarkMode ? 'border-purple-700/40 text-purple-200' : 'border-purple-200/60 text-purple-900'
           }`}>
-            <Leaf className="w-4 h-4 text-green-500" /> AGRI-HOPE
+            <Leaf className="w-4 h-4 text-green-500" /> KOFTI
           </div>
         </div>
 

@@ -211,7 +211,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoadingComplete }) => {
   };
 
   const phaseMessages = [
-    "Initializing AGRI-HOPE...",
+    "Initializing KOFTI...",
     "Connecting to agricultural networks...",
     "Loading marketplace data...",
     "Welcome to the future of farming!"
@@ -222,7 +222,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoadingComplete }) => {
   return (
     <>
       <Head>
-        <title>AGRI-HOPE - Agricultural Innovation</title>
+        <title>KOFTI - Agricultural Innovation</title>
         <meta name="description" content="Connecting farmers to global markets through innovative technology" />
       </Head>
 
@@ -325,7 +325,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoadingComplete }) => {
                     isDarkMode ? 'dark:from-purple-400 dark:via-pink-400 dark:to-fuchsia-400' : ''
                   }`}
                 >
-                  AGRI-HOPE
+                  KOFTI
                 </motion.h1>
 
                 {/* Subtitle */}

@@ -44,7 +44,7 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({ onLogout, onOpenChange }) =
             </div>
             {!collapsed && (
               <span className="text-base font-bold bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 bg-clip-text text-transparent">
-                AGRI-HOPE
+                KOFTI
               </span>
             )}
           </div>
