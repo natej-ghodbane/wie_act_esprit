@@ -94,6 +94,7 @@ export const paymentsAPI = {
     successUrl?: string;
     cancelUrl?: string;
     customerEmail?: string;
+    orderId?: string;
   }) => apiClient.post('/payments/checkout', payload),
 };
 

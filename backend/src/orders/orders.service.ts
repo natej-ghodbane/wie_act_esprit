@@ -74,6 +74,14 @@ export class OrdersService {
     );
   }
 
+  async updateSessionId(orderId: string, sessionId: string) {
+    return this.orderModel.findByIdAndUpdate(
+      new Types.ObjectId(orderId),
+      { stripeSessionId: sessionId },
+      { new: true }
+    );
+  }
+
   async getAnalytics(buyerId: string) {
     const orders = await this.orderModel.find({ buyerId: new Types.ObjectId(buyerId) });
     
