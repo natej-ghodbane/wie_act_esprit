@@ -84,7 +84,7 @@ export function Navigation({ className }: NavigationProps) {
                 <Leaf className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
               <span className="text-xl lg:text-2xl font-bold text-gradient">
-                AgriHope
+                KOFTI
               </span>
             </Link>
           </motion.div>

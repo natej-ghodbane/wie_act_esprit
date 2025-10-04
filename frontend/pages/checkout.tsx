@@ -24,7 +24,7 @@ const Checkout: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Checkout | AGRI-HOPE</title>
+        <title>Checkout | KOFTI</title>
         <meta name="description" content="Secure checkout for your farm-fresh products." />
       </Head>
       <main className="min-h-screen pt-24 pb-16">

@@ -91,8 +91,8 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Sign In - AGRI-HOPE | Agricultural Marketplace</title>
-        <meta name="description" content="Sign in to your AGRI-HOPE account and access the premier agricultural marketplace." />
+        <title>Sign In - KOFTI | Agricultural Marketplace</title>
+        <meta name="description" content="Sign in to your KOFTI account and access the premier agricultural marketplace." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -208,7 +208,7 @@ export default function LoginPage() {
                     Welcome Back
                   </h1>
                   <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Sign in to your AGRI-HOPE account
+                    Sign in to your KOFTI account
                   </p>
                 </motion.div>
 
@@ -378,7 +378,7 @@ export default function LoginPage() {
                         href="/auth/signup"
                         className="text-purple-600 dark:text-purple-400 hover:text-pink-500 font-semibold transition-colors duration-200"
                       >
-                        Join AGRI-HOPE →
+                        Join KOFTI →
                       </motion.a>
                     </p>
                   </motion.div>

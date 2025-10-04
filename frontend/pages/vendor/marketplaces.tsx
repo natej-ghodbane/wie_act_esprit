@@ -287,7 +287,7 @@ export default function MarketplacesManagement() {
                   <div className="flex items-start gap-2 mb-3">
                     <Info className="w-4 h-4 mt-1 text-pink-600" />
                     <p className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                      AGRI-HOPE uses a small, clear category set so buyers can find products easily and farmers can manage consistently.
+                      KOFTI uses a small, clear category set so buyers can find products easily and farmers can manage consistently.
                       Assign one or more categories to each marketplace based on what you plan to sell.
                     </p>
                   </div>

@@ -441,8 +441,8 @@ export default function SignupPage() {
   return (
     <>
       <Head>
-        <title>Sign Up - AGRI-HOPE | Join the Agricultural Revolution</title>
-        <meta name="description" content="Join AGRI-HOPE and connect with the future of agricultural commerce." />
+        <title>Sign Up - KOFTI | Join the Agricultural Revolution</title>
+        <meta name="description" content="Join KOFTI and connect with the future of agricultural commerce." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -590,7 +590,7 @@ export default function SignupPage() {
                   </motion.div>
                   
                   <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 dark:from-purple-400 dark:via-pink-400 dark:to-fuchsia-400 bg-clip-text text-transparent mb-2">
-                    Join AGRI-HOPE
+                    Join KOFTI
                   </h1>
                   <p className="text-gray-600 dark:text-gray-300 text-sm">
                     Create your agricultural marketplace account

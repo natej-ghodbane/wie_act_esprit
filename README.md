@@ -1,4 +1,4 @@
-# 🌾 AGRI-HOPE Marketplace Platform
+# 🌾 KOFTI Marketplace Platform
 
 A comprehensive marketplace platform connecting farmers, vendors, and buyers through modern web technologies. Built with Next.js frontend and Nest.js backend for agricultural commerce and education.
 
