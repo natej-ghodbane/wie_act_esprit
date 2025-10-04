@@ -12,6 +12,8 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -19,6 +21,7 @@ import { extname } from 'path';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 // Multer configuration for file uploads
 /*
@@ -84,6 +87,17 @@ export class UsersController {
   @Get('stats')
   getStats() {
     return this.usersService.getUserStats();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  async getProfile(@Request() req) {
+    try {
+      const user = await this.usersService.findOne(req.user._id || req.user.id);
+      return user;
+    } catch (error) {
+      throw new BadRequestException('Failed to fetch user profile');
+    }
   }
 
   @Get(':id')
