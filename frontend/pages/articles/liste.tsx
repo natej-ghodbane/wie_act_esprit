@@ -21,7 +21,8 @@ export default function ArticlesPage() {
         {articles.map(article => (
           <Link
             key={article.id}
-            href={`/articles/internes/${article.id}`}
+            // ⚠️ MODIFIED: Changed to use query parameter (?id=...)
+            href={`/articles/internes?id=${article.id}`} 
             className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg p-6 hover:shadow-xl transition block"
           >
             <h2 className="text-lg font-semibold text-pink-700 mb-2">{article.title}</h2>

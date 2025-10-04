@@ -1,6 +1,8 @@
+//articles/internes.tsx
 "use client";
 
-import { useParams } from "next/navigation";
+// ⚠️ MODIFIED: Changed import from useParams to useSearchParams
+import { useSearchParams } from "next/navigation"; 
 
 const articles = {
   "1": {
@@ -38,7 +40,10 @@ const articles = {
 };
 
 export default function ArticleDetail() {
-  const { id } = useParams();
+  // ⚠️ MODIFIED: Reading 'id' from the URL query string
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id'); 
+  
   const article = articles[id as keyof typeof articles];
 
   if (!article) {
