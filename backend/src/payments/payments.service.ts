@@ -7,6 +7,7 @@ interface CreateCheckoutDto {
   successUrl?: string;
   cancelUrl?: string;
   customerEmail?: string;
+  orderId?: string;
 }
 
 @Injectable()
@@ -56,6 +57,9 @@ export class PaymentsService {
         success_url,
         cancel_url,
         customer_email: payload.customerEmail,
+        metadata: {
+          orderId: payload.orderId || '', // Pass order ID if available
+        },
       });
 
       console.log('Checkout session created successfully:', session.id);

@@ -97,14 +97,32 @@ export class PaymentsController {
       console.log('Session metadata:', session.metadata);
       
       try {
-        // Try to find order by session ID first
-        const orderBySession = await this.ordersService.updateStatusBySessionId(session.id, 'paid');
+        let orderUpdated = false;
         
-        if (orderBySession) {
-          console.log('Order status updated to paid by session ID:', orderBySession._id);
-        } else {
-          // Fallback: find the most recent pending order for this customer
-          console.log('No order found by session ID, trying fallback method');
+        // First try: Use orderId from metadata if available
+        if (session.metadata?.orderId) {
+          console.log('Updating order by metadata orderId:', session.metadata.orderId);
+          const order = await this.ordersService.updateStatus(session.metadata.orderId, 'paid');
+          if (order) {
+            console.log('Order status updated to paid by metadata orderId:', order._id);
+            orderUpdated = true;
+          }
+        }
+        
+        // Second try: Find order by session ID
+        if (!orderUpdated) {
+          console.log('Trying to find order by session ID:', session.id);
+          const orderBySession = await this.ordersService.updateStatusBySessionId(session.id, 'paid');
+          
+          if (orderBySession) {
+            console.log('Order status updated to paid by session ID:', orderBySession._id);
+            orderUpdated = true;
+          }
+        }
+        
+        // Fallback: find the most recent pending order for this customer
+        if (!orderUpdated) {
+          console.log('No order found by session ID or metadata, trying fallback method');
           
           // Get all orders for this customer
           const orders = await this.ordersService.findAllByBuyer(session.customer_email || '');
@@ -119,9 +137,14 @@ export class PaymentsController {
             const mostRecentPending = pendingOrders[0]; // They're sorted by createdAt desc
             await this.ordersService.updateStatus(String(mostRecentPending._id), 'paid');
             console.log('Order status updated to paid (fallback):', mostRecentPending._id);
+            orderUpdated = true;
           } else {
             console.log('No pending orders found for customer:', session.customer_email);
           }
+        }
+        
+        if (!orderUpdated) {
+          console.error('Failed to update any order for session:', session.id);
         }
       } catch (error) {
         console.error('Error updating order status:', error);
