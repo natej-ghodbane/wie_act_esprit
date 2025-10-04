@@ -22,7 +22,8 @@ import {
   Calendar,
   ArrowUpRight,
   Store,
-  BookOpen
+  BookOpen,
+  FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -372,6 +373,7 @@ export default function VendorDashboard() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { icon: Store, label: 'My Marketplaces', route: '/vendor/marketplaces', color: 'purple' },
+                { icon: FileText, label: 'Dashboard', route: '/page1', color: 'purple' },
                 { icon: Settings, label: 'Farm Settings', route: '/vendor/settings', color: 'purple' },
                 { icon: BookOpen, label: 'Help / Manual', route: '/vendor/help', color: 'purple' },
               ].map((action, index) => (
